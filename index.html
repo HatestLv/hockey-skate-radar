@@ -220,6 +220,23 @@ h1{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-weight:
 table{border-collapse:collapse;width:100%;background:var(--card);min-width:640px}
 th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--line)}
 th{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+
+/* PIEVIENOTS: Labākās cenas izcēluma stili tabulā */
+.best-price {
+  background: rgba(52, 211, 153, 0.1) !important;
+  border: 2px solid var(--green) !important;
+  position: relative;
+}
+.best-badge {
+  display: block;
+  font-size: 10px;
+  color: var(--green);
+  font-weight: 800;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
 .empty{background:var(--card);border:1px dashed var(--line);border-radius:12px;padding:28px;text-align:center;color:var(--muted)}
 .src{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
 .src .card{padding:14px 16px;gap:8px}
@@ -383,7 +400,8 @@ let OFFERS = [
   { model: 'bauer-supreme-f40',  retailer: 'sp', section: 'new', price: null, oldPrice: null, shipping: 4,    sizes: ['7','7.5'], fits: ['FIT 3'],         stock: false, checked: null,         url: 'https://www.sportega.lv/hladat?q=Supreme+F40', status: 'DEMO' },
   { model: 'bauer-supreme-m40',  retailer: 'hp', section: 'new', price: 349, oldPrice: 463,  shipping: 3.5,  sizes: ['7','7.5'], fits: ['FIT 2'],         stock: true,  checked: '2026-10-28', url: 'https://hokejapasaule.lv/lv_lv/bauer-supreme-s24-m40-senior-hokeja-slidas', status: 'VERIFIED' },
   { model: 'bauer-supreme-m40',  retailer: 'hj', section: 'new', price: 416.49, oldPrice: 489.99, shipping: 0, sizes: ['7','7.5'], fits: ['FIT 2'],      stock: true,  checked: '2026-10-28', url: 'https://www.hokejam.lv/lv/pieauguso-hokeja-slidas/4507-bauer-supreme-m40-pieauguso-hokeja-slidas', status: 'VERIFIED' },
-  { model: 'bauer-supreme-m40',  retailer: 'sp', section: 'new', price: null, oldPrice: null, shipping: null, sizes: ['8'],      fits: ['FIT 2'],         stock: false, checked: null,         url: 'https://www.sportega.lv/hladat?q=Supreme+M40', status: 'DEMO' }
+  // MAINĪTS: Nomainīta Sportega M40 tiešā adrese
+  { model: 'bauer-supreme-m40',  retailer: 'sp', section: 'new', price: null, oldPrice: null, shipping: null, sizes: ['8'],      fits: ['FIT 2'],         stock: false, checked: null,         url: 'https://www.sportega.lv/hokeja-slidas-bauer-supreme-m40-senior/d1438036', status: 'DEMO' }
 ];
 
 let DATA_SYNC_SOURCE = 'LOKĀLIE DATI';
@@ -536,13 +554,27 @@ function storeCard(m, rKey) {
   }
 }
 
+// MAINĪTS: Pārveidots table() funkcijas kods, lai izceltu labāko cenu ar zaļu apmali un "Labākā cena" birku.
 function table(list) {
   const rs = Object.keys(RETAILERS);
   const head = rs.map(k => `<th>${RETAILERS[k].name}</th>`).join('');
   const body = MODELS.map(m => {
+    // 1. Atrodam minimālo cenu (tikai tiem, kas ir noliktavā un ar norādītu cenu)
+    const modelOffers = list.filter(x => x.model === m.id && x.price != null && x.stock);
+    const minTotal = modelOffers.length > 0 ? Math.min(...modelOffers.map(x => total(x))) : null;
+
     const cells = rs.map(k => {
       const o = list.find(x => x.model === m.id && x.retailer === k);
-      return `<td>${o && o.price != null ? `<b>${eur(total(o))}</b><br><small>${(o.sizes||[]).join(', ')} · ${(o.fits||[]).join(', ')}</small>` : '<span class="badge b-no">Nav datu / filtrs</span>'}</td>`;
+      if (o && o.price != null) {
+        const t = total(o);
+        // 2. Pārbaudām, vai šis piedāvājums ir lētākais šim modelim
+        const isBest = (minTotal !== null && t === minTotal && o.stock);
+        const cellClass = isBest ? ' class="best-price"' : '';
+        const bestBadge = isBest ? '<span class="best-badge">★ Labākā cena</span>' : '';
+        
+        return `<td${cellClass}>${bestBadge}<b>${eur(t)}</b><br><small>${(o.sizes||[]).join(', ')} · ${(o.fits||[]).join(', ')}</small></td>`;
+      }
+      return `<td><span class="badge b-no">Nav datu / filtrs</span></td>`;
     }).join('');
     return `<tr><td><b>${m.brand} ${m.name}</b></td>${cells}</tr>`;
   }).join('');
