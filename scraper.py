@@ -75,8 +75,8 @@ TARGET_SKATES = [
         "id": "bauer-supreme-m40",
         "name": "Bauer Supreme M40",
         "urls": {
-            # Hokeja Pasaule tiešā pieaugušo preces lapa
-            "hp": "https://hokejapasaule.lv/lv_lv/bauer-supreme-s24-m40-senior-ice-hockey-skates",
+            # Hokeja Pasaule tiešā pieaugušo preces lapa (izlabots latviskais nosaukums)
+            "hp": "https://hokejapasaule.lv/lv_lv/bauer-supreme-s24-m40-senior-hokeja-slidas",
             # Hokejam.lv tiešā pieaugušo preces lapa
             "hj": "https://www.hokejam.lv/lv/pieauguso-hokeja-slidas/4507-bauer-supreme-m40-pieauguso-hokeja-slidas",
             # Sportega meklēšanas lapa
@@ -147,16 +147,14 @@ class HockeySkateScraper:
         if old_box:
             res["oldPrice"] = self.clean_price(old_box.text)
 
-        # 2. Precīza pieejamības noteikšana (tikai produkta blokā)
+        # 2. Precīza pieejamības noteikšana (tikai produkta pirkšanas blokā)
         if res["price"]:
             prod_info = soup.select_one(".product-info-main, .product-add-form") or soup
             info_text = prod_info.get_text().lower()
 
-            # Pārbauda "Ir noliktavā" vai groza pogu
             has_add_button = prod_info.select_one("#product-addtocart-button, button.tocart, .action.tocart") is not None
             has_stock_tag = "ir noliktavā" in info_text or "in stock" in info_text
 
-            # Ja ir poga vai skaidrs noliktavas paziņojums, prece IR pieejama
             if has_add_button or has_stock_tag:
                 res["stock"] = True
             elif "nav noliktavā" in info_text:
@@ -180,7 +178,6 @@ class HockeySkateScraper:
         if old_box:
             res["oldPrice"] = self.clean_price(old_box.text)
 
-        # Ja tā ir meklēšanas lapa, meklē pirmo atbilstošo Senior preci
         if not res["price"]:
             item = soup.select_one(".product-miniature, .product-item, .item-inner")
             if item:
@@ -192,7 +189,6 @@ class HockeySkateScraper:
                     res["price"] = self.clean_price(p_elem.text)
 
         if res["price"]:
-            # PrestaShop pieejamības bloks
             avail_elem = soup.select_one("#product-availability, .product-availability")
             if avail_elem:
                 txt = avail_elem.get_text().lower()
