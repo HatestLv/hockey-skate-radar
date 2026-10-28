@@ -341,7 +341,7 @@ footer.bar{position:relative;margin-top:70px;background:var(--footer-bg);border-
 </footer>
 
 <script>
-// --- DATI (no data.js) ---
+// --- PAMATA MODEĻI ---
 const MODELS = [
   { id: 'bauer-vapor-fly40', brand: 'Bauer', match: { forward: 85, defense: 60 }, name: 'Vapor S25 FLY40 Senior',
     note: 'Vapor sērija ir pozicionēta uz mazāku svaru un ātrumu (ražotāja pozicionējums). Der ātram uzbrucējam; piemērotība platumam jāpārbauda pielaikošanā.' },
@@ -357,7 +357,8 @@ const RETAILERS = {
   sp: { id: 'sp', name: 'Sportega',       file: 'sportega',       url: 'https://www.sportega.lv/' }
 };
 
-const OFFERS = [
+// Sākotnējie rezerves dati (tiek aizstāti, tiklīdz ielādējas scraped_data.json)
+let OFFERS = [
   { model: 'bauer-vapor-fly40',  retailer: 'hp', section: 'new', price: 399, oldPrice: 449, shipping: 3.5,  sizes: ['7','7.5'], fits: ['FIT 2'],         stock: true,  checked: '2025-02-15', url: RETAILERS.hp.url, status: 'VERIFIED' },
   { model: 'bauer-vapor-fly40',  retailer: 'hj', section: 'new', price: 389, oldPrice: null, shipping: 0,    sizes: ['7.5','8'], fits: ['FIT 2','FIT 3'], stock: true,  checked: null,         url: RETAILERS.hj.url, status: 'DEMO' },
   { model: 'bauer-vapor-fly40',  retailer: 'sp', section: 'new', price: 409, oldPrice: null, shipping: null, sizes: ['7'],      fits: ['FIT 1'],         stock: false, checked: null,         url: RETAILERS.sp.url, status: 'DEMO' },
@@ -368,6 +369,9 @@ const OFFERS = [
   { model: 'bauer-supreme-m40',  retailer: 'hj', section: 'new', price: 359, oldPrice: null, shipping: 0,    sizes: ['7'],       fits: ['FIT 1','FIT 2'], stock: true,  checked: null,         url: RETAILERS.hj.url, status: 'DEMO' },
   { model: 'bauer-supreme-m40',  retailer: 'sp', section: 'new', price: 339, oldPrice: null, shipping: null, sizes: ['8'],      fits: ['FIT 2'],         stock: true,  checked: null,         url: RETAILERS.sp.url, status: 'DEMO' }
 ];
+
+let DATA_SYNC_SOURCE = 'LOKĀLIE DATI';
+let LAST_SYNC_DATE = null;
 
 const USED_SOURCES = [
   { name: 'SS.lv',                url: 'https://www.ss.lv/lv/sports/skating/hockey-skates/' },
@@ -398,7 +402,7 @@ function loadProfile() {
 
 let PROFILE = loadProfile();
 
-// --- LIETOTNES STĀVOKLIS (sinhronizēts ar profilu) ---
+// --- LIETOTNES STĀVOKLIS ---
 const S = {
   tab: 'new',
   view: 'cards',
@@ -409,7 +413,7 @@ const S = {
 const TABS = { new:'Jaunas slidas LV', used:'Lietotas slidas', intl:'Ārzemju deals', profile:'Mans profils' };
 const model = id => MODELS.find(m => m.id === id);
 const eur = n => n == null ? '—' : '€' + n.toFixed(2);
-const total = o => o.price + (o.shipping || 0);
+const total = o => (o && o.price != null) ? o.price + (o.shipping || 0) : null;
 const badge = s => s === 'VERIFIED' ? '<span class="badge b-ok">Pārbaudīts</span>'
   : s === 'DEMO' ? '<span class="badge b-demo">DEMO — NAV REĀLI DATI</span>'
   : '<span class="badge b-no">Nav pārbaudīts</span>';
@@ -453,13 +457,14 @@ function storeCard(m, rKey) {
   const r = RETAILERS[rKey];
   const o = OFFERS.find(x => x.model === m.id && x.retailer === rKey);
 
-  const matchSize = !o ? false : (PROFILE.size === 'pref' ? o.sizes.some(s => s === '7' || s === '7.5') : (PROFILE.size === 'all' || o.sizes.includes(PROFILE.size)));
-  const matchFit = !o ? false : (PROFILE.fit === 'all' || o.fits.includes(PROFILE.fit));
-  const matchPrice = !o ? false : (total(o) >= PROFILE.min && total(o) <= PROFILE.max);
+  const t = total(o);
+  const matchSize = !o ? false : (PROFILE.size === 'pref' ? (o.sizes || []).some(s => s === '7' || s === '7.5') : (PROFILE.size === 'all' || (o.sizes || []).includes(PROFILE.size)));
+  const matchFit = !o ? false : (PROFILE.fit === 'all' || (o.fits || []).includes(PROFILE.fit));
+  const matchPrice = (t != null) && (t >= PROFILE.min && t <= PROFILE.max);
   const matchStock = !o ? false : (S.stock ? o.stock : true);
   const matchModel = PROFILE.prefModel === 'all' || PROFILE.prefModel === m.id;
 
-  const isAvailable = o && o.stock && matchSize && matchFit && matchPrice && matchStock && matchModel;
+  const isAvailable = o && o.stock && o.price != null && matchSize && matchFit && matchPrice && matchStock && matchModel;
 
   if (isAvailable) {
     const est = o.shipping == null ? ' <small>(piegāde nav zināma)</small>' : '';
@@ -477,8 +482,8 @@ function storeCard(m, rKey) {
         ${row('Cena', `<span class="price">${eur(o.price)}</span>${o.oldPrice ? `<span class="old">${eur(o.oldPrice)}</span>` : ''}`)}
         ${row('Piegāde', o.shipping == null ? 'Nav zināma' : eur(o.shipping))}
         ${row('Kopā', eur(total(o)) + est)}
-        ${row('Izmēri', o.sizes.join(', '))}
-        ${row('Bauer FIT', o.fits.join(', '))}
+        ${row('Izmēri', (o.sizes || []).join(', ') || 'Standarta')}
+        ${row('Bauer FIT', (o.fits || []).join(', ') || 'Standarta')}
         ${row('Pieejamība', '<span style="color:var(--green);font-weight:700">Noliktavā</span>')}
         ${row('Pēdējā pārbaude', o.checked || 'Nav pārbaudīts')}
         ${meter(m)}
@@ -487,7 +492,7 @@ function storeCard(m, rKey) {
       <a class="btn" href="${o.url}" target="_blank" rel="noopener">Atvērt veikalu →</a>
     </article>`;
   } else {
-    const reason = !o ? 'Nav piedāvājuma' : !o.stock ? 'Izpārdots' : !matchModel ? 'Neatbilst vēlamajam modelim' : 'Neatbilst profila filtram';
+    const reason = !o ? 'Nav piedāvājuma' : !o.stock ? 'Izpārdots' : o.price == null ? 'Cena nav pieejama' : !matchModel ? 'Neatbilst vēlamajam modelim' : 'Neatbilst profila filtram';
     return `<article class="card card-zero">
       <div class="imgbox">
         <img src="img/${m.id}.png" alt="${m.brand} ${m.name}" onerror="this.parentNode.classList.add('missing')">
@@ -520,7 +525,7 @@ function table(list) {
   const body = MODELS.map(m => {
     const cells = rs.map(k => {
       const o = list.find(x => x.model === m.id && x.retailer === k);
-      return `<td>${o ? `<b>${eur(total(o))}</b><br><small>${o.sizes.join(', ')} · ${o.fits.join(', ')}</small>` : '<span class="badge b-no">Nav datu / filtrs</span>'}</td>`;
+      return `<td>${o && o.price != null ? `<b>${eur(total(o))}</b><br><small>${(o.sizes||[]).join(', ')} · ${(o.fits||[]).join(', ')}</small>` : '<span class="badge b-no">Nav datu / filtrs</span>'}</td>`;
     }).join('');
     return `<tr><td><b>${m.brand} ${m.name}</b></td>${cells}</tr>`;
   }).join('');
@@ -572,9 +577,9 @@ function viewNew() {
   <p class="sub">Hokeja Pasaule, Hokejam.lv, Sportega. Profila iestatījumi: <b>${ROLES[PROFILE.role]}</b>, izmēri <b>${SIZE_LABELS[PROFILE.size] || PROFILE.size}</b>, prioritāte <b>${PROFILE.fit}</b>.</p>
   <div class="sum">
     <div><small>Labākais pārbaudītais</small><b>${best ? eur(total(best)) : 'Nav pārbaudītu datu'}</b></div>
-    <div><small>Zemākā cena (profilam)</small><b>${low ? eur(total(low)) + ' <span class="badge b-demo">DEMO</span>' : '—'}</b></div>
+    <div><small>Zemākā cena (profilam)</small><b>${low ? eur(total(low)) : '—'}</b></div>
     <div><small>Pārbaudīti piedāvājumi</small><b>${verified} no ${OFFERS.length}</b></div>
-    <div><small>Spēlētāja pozīcija</small><b>${ROLES[PROFILE.role].toUpperCase()}</b></div>
+    <div><small>Datu avots</small><b><span class="badge b-ok">${DATA_SYNC_SOURCE}</span></b></div>
   </div>
   ${filtersBar()}
   ${S.view === 'cards' ? `<div class="stores-container">${columnsHtml}</div>` : table(OFFERS)}`;
@@ -693,13 +698,37 @@ function viewIntl() {
 
 function render() {
   document.getElementById('nav').innerHTML = Object.entries(TABS)
-    .filter(([k]) => k !== 'profile') // Profils pieejams caur izvēlni un pill pogu
+    .filter(([k]) => k !== 'profile')
     .map(([k, t]) => `<button data-t="${k}" class="${S.tab === k ? 'on' : ''}">${t}</button>`).join('');
 
   if (S.tab === 'new') document.getElementById('app').innerHTML = viewNew();
   else if (S.tab === 'used') document.getElementById('app').innerHTML = viewUsed();
   else if (S.tab === 'intl') document.getElementById('app').innerHTML = viewIntl();
   else if (S.tab === 'profile') document.getElementById('app').innerHTML = viewProfile();
+}
+
+// --- AUTOMĀTISKA DATU SINHRONIZĀCIJA AR SCRAPED_DATA.JSON ---
+async function loadScrapedData() {
+  try {
+    const response = await fetch('scraped_data.json?t=' + Date.now());
+    if (!response.ok) throw new Error('scraped_data.json nav pieejams');
+    
+    const liveData = await response.json();
+    if (Array.isArray(liveData) && liveData.length > 0) {
+      liveData.forEach(item => {
+        const idx = OFFERS.findIndex(o => o.model === item.model && o.retailer === item.retailer);
+        if (idx !== -1) {
+          OFFERS[idx] = { ...OFFERS[idx], ...item };
+        } else {
+          OFFERS.push(item);
+        }
+      });
+      DATA_SYNC_SOURCE = 'GITHUB ACTIONS (LIVE)';
+      render();
+    }
+  } catch (err) {
+    console.info('Izmanto lokālos/noklusētos datus:', err.message);
+  }
 }
 
 function toggleTheme() {
@@ -730,7 +759,6 @@ document.addEventListener('click', e => {
     return; 
   }
 
-  // Aizvērt izvēlni, ja uzklikšķina ārpus tās
   if (!e.target.closest('.menu-box')) {
     toggleMenu(true);
   }
@@ -793,7 +821,9 @@ document.addEventListener('change', e => {
   render();
 });
 
+// Sākotnējais renderējums un datu sinhronizācijas palaišana
 render();
+loadScrapedData();
 </script>
 </body>
 </html>
