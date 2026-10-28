@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+
 <html lang="lv">
 <head>
 <meta charset="UTF-8">
@@ -328,7 +328,7 @@ footer.bar{position:relative;margin-top:70px;background:var(--footer-bg);border-
       </div>
     </div>
     <div class="footer-bottom">
-      <div class="footer-copy">© 2025 HOCKEY SKATE RADAR. Visas tiesības aizsargātas.</div>
+      <div class="footer-copy">© 2026 HOCKEY SKATE RADAR. Visas tiesības aizsargātas.</div>
       <div class="footer-disclaimer">
         Cenas, noliktavas atlikumi un piegādes izmaksas tiek iegūtas no publiskajiem veikalu datiem un var tikt mainītas bez iepriekšēja brīdinājuma. Pirms pirkuma veikšanas lūdzam precizēt informāciju konkrētā pārdevēja vietnē.
       </div>
@@ -338,9 +338,6 @@ footer.bar{position:relative;margin-top:70px;background:var(--footer-bg);border-
 
 <script>
 // --- MODEĻU SPECIFIKĀCIJA UN DINAMISKAIS ATBILSTĪBAS INDEKSS ---
-// Ražotāju ģeometrija:
-// Vapor: Agility / Sprints / Asāks leņķis (PowerFly holder) -> optimāls uzbrucējam
-// Supreme: Power / Stabilitāte / Taisnvirziena atspēriens -> optimāls aizsargam
 const MODELS = [
   {
     id: 'bauer-vapor-fly40',
@@ -379,14 +376,14 @@ const RETAILERS = {
 
 let OFFERS = [
   { model: 'bauer-vapor-fly40',  retailer: 'hp', section: 'new', price: 535, oldPrice: null, shipping: 3.5,  sizes: ['7','7.5'], fits: ['FIT 2'],         stock: true,  checked: '2026-10-28', url: 'https://hokejapasaule.lv/lv_lv/bauer-vapor-s25-fly40-senior-hokeja-slidas', status: 'VERIFIED' },
-  { model: 'bauer-vapor-fly40',  retailer: 'hj', section: 'new', price: null, oldPrice: null, shipping: 0,    sizes: ['7.5','8'], fits: ['FIT 2'],         stock: false, checked: null,         url: RETAILERS.hj.url, status: 'DEMO' },
-  { model: 'bauer-vapor-fly40',  retailer: 'sp', section: 'new', price: null, oldPrice: null, shipping: null, sizes: ['7'],      fits: ['FIT 1'],         stock: false, checked: null,         url: RETAILERS.sp.url, status: 'DEMO' },
+  { model: 'bauer-vapor-fly40',  retailer: 'hj', section: 'new', price: null, oldPrice: null, shipping: 0,    sizes: ['7.5','8'], fits: ['FIT 2'],         stock: false, checked: null,         url: 'https://www.hokejam.lv/lv/search?s=Vapor+FLY40', status: 'DEMO' },
+  { model: 'bauer-vapor-fly40',  retailer: 'sp', section: 'new', price: null, oldPrice: null, shipping: null, sizes: ['7'],      fits: ['FIT 1'],         stock: false, checked: null,         url: 'https://www.sportega.lv/hladat?q=Bauer+Vapor', status: 'DEMO' },
   { model: 'bauer-supreme-f40',  retailer: 'hp', section: 'new', price: 535, oldPrice: null, shipping: 3.5,  sizes: ['7','7.5'], fits: ['FIT 2'],         stock: true,  checked: '2026-10-28', url: 'https://hokejapasaule.lv/lv_lv/bauer-supreme-s26-f40-senior-hokeja-slidas', status: 'VERIFIED' },
   { model: 'bauer-supreme-f40',  retailer: 'hj', section: 'new', price: 475.99, oldPrice: 559.99, shipping: 0, sizes: ['7.5'],  fits: ['FIT 2'],         stock: true,  checked: '2026-10-28', url: 'https://www.hokejam.lv/lv/pieauguso-hokeja-slidas/5455-bauer-supreme-f40-s26-pieauguso-hokeja-slidas', status: 'VERIFIED' },
-  { model: 'bauer-supreme-f40',  retailer: 'sp', section: 'new', price: null, oldPrice: null, shipping: 4,    sizes: ['7','7.5'], fits: ['FIT 3'],         stock: false, checked: null,         url: RETAILERS.sp.url, status: 'DEMO' },
-  { model: 'bauer-supreme-m40',  retailer: 'hp', section: 'new', price: 349, oldPrice: 399,  shipping: 3.5,  sizes: ['7.5'],     fits: ['FIT 2'],         stock: true,  checked: null,         url: RETAILERS.hp.url, status: 'DEMO' },
+  { model: 'bauer-supreme-f40',  retailer: 'sp', section: 'new', price: null, oldPrice: null, shipping: 4,    sizes: ['7','7.5'], fits: ['FIT 3'],         stock: false, checked: null,         url: 'https://www.sportega.lv/hladat?q=Supreme+F40', status: 'DEMO' },
+  { model: 'bauer-supreme-m40',  retailer: 'hp', section: 'new', price: 349, oldPrice: 463,  shipping: 3.5,  sizes: ['7','7.5'], fits: ['FIT 2'],         stock: true,  checked: '2026-10-28', url: 'https://hokejapasaule.lv/lv_lv/bauer-supreme-s24-m40-senior-hokeja-slidas', status: 'VERIFIED' },
   { model: 'bauer-supreme-m40',  retailer: 'hj', section: 'new', price: 416.49, oldPrice: 489.99, shipping: 0, sizes: ['7','7.5'], fits: ['FIT 2'],      stock: true,  checked: '2026-10-28', url: 'https://www.hokejam.lv/lv/pieauguso-hokeja-slidas/4507-bauer-supreme-m40-pieauguso-hokeja-slidas', status: 'VERIFIED' },
-  { model: 'bauer-supreme-m40',  retailer: 'sp', section: 'new', price: null, oldPrice: null, shipping: null, sizes: ['8'],      fits: ['FIT 2'],         stock: false, checked: null,         url: RETAILERS.sp.url, status: 'DEMO' }
+  { model: 'bauer-supreme-m40',  retailer: 'sp', section: 'new', price: null, oldPrice: null, shipping: null, sizes: ['8'],      fits: ['FIT 2'],         stock: false, checked: null,         url: 'https://www.sportega.lv/hladat?q=Supreme+M40', status: 'DEMO' }
 ];
 
 let DATA_SYNC_SOURCE = 'LOKĀLIE DATI';
@@ -444,7 +441,6 @@ const SIZE_LABELS = {
   'all': 'Visi izmēri'
 };
 
-// Autentisks ražotāja ģeometrijas atbilstības indikators (bez DEMO atzīmes)
 function meter(m) {
   const v = m.match && m.match[PROFILE.role];
   if (v == null) return '';
@@ -513,6 +509,7 @@ function storeCard(m, rKey) {
     </article>`;
   } else {
     const reason = !o ? 'Nav piedāvājuma' : !o.stock ? 'Izpārdots' : o.price == null ? 'Cena nav pieejama' : !matchModel ? 'Neatbilst vēlamajam modelim' : 'Neatbilst profila filtram';
+    const targetUrl = (o && o.url) || r.url;
     return `<article class="card card-zero">
       <div class="imgbox">
         <img src="img/${m.id}.png" alt="${m.brand} ${m.name}" onerror="this.parentNode.classList.add('missing')">
@@ -534,7 +531,7 @@ function storeCard(m, rKey) {
         ${meter(m)}
         <p class="note">${m.note}</p>
       </div>
-      <a class="btn btn-zero" href="${(o && o.url) || r.url}" target="_blank" rel="noopener">Pārbaudīt ${r.name} lapā →</a>
+      <a class="btn btn-zero" href="${targetUrl}" target="_blank" rel="noopener">Pārbaudīt ${r.name} lapā →</a>
     </article>`;
   }
 }
