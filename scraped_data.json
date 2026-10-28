@@ -15,7 +15,7 @@
     ],
     "stock": false,
     "checked": null,
-    "url": "https://hokejapasaule.lv/meklesana?search=Vapor+FLY40",
+    "url": "https://hokejapasaule.lv/lv_lv/bauer-vapor-s25-fly40-senior-hokeja-slidas",
     "status": "DEMO"
   },
   {
@@ -34,7 +34,7 @@
     ],
     "stock": false,
     "checked": null,
-    "url": "https://www.hokejam.lv/lv/meklet?keyword=Vapor+FLY40",
+    "url": "https://www.hokejam.lv/lv/search?s=Vapor+FLY40",
     "status": "DEMO"
   },
   {
@@ -53,7 +53,7 @@
     ],
     "stock": false,
     "checked": null,
-    "url": "https://www.sportega.lv/meklet?q=Vapor+FLY40",
+    "url": "https://www.sportega.lv/hladat?q=Vapor+FLY40",
     "status": "DEMO"
   },
   {
@@ -72,7 +72,7 @@
     ],
     "stock": false,
     "checked": null,
-    "url": "https://hokejapasaule.lv/meklesana?search=Supreme+F40",
+    "url": "https://hokejapasaule.lv/lv_lv/bauer-supreme-s26-f40-senior-hokeja-slidas",
     "status": "DEMO"
   },
   {
@@ -91,7 +91,7 @@
     ],
     "stock": false,
     "checked": null,
-    "url": "https://www.hokejam.lv/lv/meklet?keyword=Supreme+F40",
+    "url": "https://www.hokejam.lv/lv/search?s=Supreme+F40",
     "status": "DEMO"
   },
   {
@@ -110,7 +110,7 @@
     ],
     "stock": false,
     "checked": null,
-    "url": "https://www.sportega.lv/meklet?q=Supreme+F40",
+    "url": "https://www.sportega.lv/hladat?q=Supreme+F40",
     "status": "DEMO"
   },
   {
@@ -129,15 +129,15 @@
     ],
     "stock": false,
     "checked": null,
-    "url": "https://hokejapasaule.lv/meklesana?search=Supreme+M40",
+    "url": "https://hokejapasaule.lv/lv_lv/bauer-supreme-s24-m40-senior-ice-hockey-skates",
     "status": "DEMO"
   },
   {
     "model": "bauer-supreme-m40",
     "retailer": "hj",
     "section": "new",
-    "price": null,
-    "oldPrice": null,
+    "price": 416.49,
+    "oldPrice": 489.99,
     "shipping": 0.0,
     "sizes": [
       "7",
@@ -146,10 +146,10 @@
     "fits": [
       "FIT 2"
     ],
-    "stock": false,
-    "checked": null,
-    "url": "https://www.hokejam.lv/lv/meklet?keyword=Supreme+M40",
-    "status": "DEMO"
+    "stock": true,
+    "checked": "2026-10-28",
+    "url": "https://www.hokejam.lv/lv/pieauguso-hokeja-slidas/4507-bauer-supreme-m40-pieauguso-hokeja-slidas",
+    "status": "VERIFIED"
   },
   {
     "model": "bauer-supreme-m40",
@@ -167,7 +167,7 @@
     ],
     "stock": false,
     "checked": null,
-    "url": "https://www.sportega.lv/meklet?q=Supreme+M40",
+    "url": "https://www.sportega.lv/hladat?q=Supreme+M40",
     "status": "DEMO"
   }
 ]
