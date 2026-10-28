@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-28T19:41:42.063496",
+  "updatedAt": "2026-10-28T19:57:12.025984",
   "offers": [
     {
       "model": "bauer-vapor-fly40",
@@ -100,7 +100,7 @@
       "model": "bauer-supreme-f40",
       "retailer": "sp",
       "section": "new",
-      "price": 0.0,
+      "price": 489.99,
       "oldPrice": null,
       "shipping": 4.0,
       "sizes": [
@@ -108,12 +108,12 @@
         "7.5"
       ],
       "fits": [
-        "FIT 3"
+        "FIT 2"
       ],
-      "stock": false,
+      "stock": true,
       "checked": "2026-10-28",
-      "url": "https://www.sportega.lv/hladat?q=Supreme+F40",
-      "status": "UNVERIFIED"
+      "url": "https://www.sportega.lv/hokeja-slidas-bauer-supreme-f40-senior/d1583973",
+      "status": "VERIFIED"
     },
     {
       "model": "bauer-supreme-m40",
