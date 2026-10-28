@@ -133,7 +133,7 @@ nav button.on{background:var(--nav-btn-on-bg);border-color:var(--nav-btn-on-bord
 .meter{position:relative;height:8px;border-radius:99px;background:linear-gradient(90deg,#ef4444,#f59e0b 50%,#34d399)}
 .meter i{position:absolute;top:-4px;width:4px;height:16px;border-radius:2px;background:#fff;transform:translateX(-50%);box-shadow:0 0 0 2px var(--card)}
 #f-sort{width:auto;max-width:160px;text-overflow:ellipsis}
-h1{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-weight:800;font-size:clamp(30px,4.5vw,44px);line-height:1.15;margin:36px 0 10px;letter-spacing:-.02em}
+h1{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-weight:800;font-size:clamp(30px,4.5vw,44px);line-height:1.15;letter-spacing:-.02em}
 .sub{color:var(--muted);font-size:clamp(15px,1.5vw,18px);line-height:1.5;margin:0 0 22px}
 .sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:16px}
 .sum div{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
@@ -220,23 +220,6 @@ h1{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-weight:
 table{border-collapse:collapse;width:100%;background:var(--card);min-width:640px}
 th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--line)}
 th{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.05em}
-
-/* PIEVIENOTS: Labākās cenas izcēluma stili tabulā */
-.best-price {
-  background: rgba(52, 211, 153, 0.1) !important;
-  border: 2px solid var(--green) !important;
-  position: relative;
-}
-.best-badge {
-  display: block;
-  font-size: 10px;
-  color: var(--green);
-  font-weight: 800;
-  margin-bottom: 4px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
 .empty{background:var(--card);border:1px dashed var(--line);border-radius:12px;padding:28px;text-align:center;color:var(--muted)}
 .src{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
 .src .card{padding:14px 16px;gap:8px}
@@ -336,13 +319,26 @@ footer.bar{position:relative;margin-top:70px;background:var(--footer-bg);border-
           Neatkarīgs hokeja ekipējuma cenu un pieejamības agregators. Mēs uzraugām vadošo Latvijas un Eiropas tirdzniecības vietu piedāvājumu, lai palīdzētu spēlētājiem atrast piemērotāko inventāru par labāko cenu.
         </p>
       </div>
-      <div class="footer-links">
-        <span class="footer-links-title">Ātrās saites</span>
-        <a href="#" data-open="profile">Spēlētāja profils un iestatījumi</a>
-        <a href="https://www.hokejam.lv/" target="_blank" rel="noopener">Hokejam.lv</a>
-        <a href="https://hokejapasaule.lv/" target="_blank" rel="noopener">Hokeja Pasaule</a>
-        <a href="https://www.sportega.lv/" target="_blank" rel="noopener">Sportega</a>
+      
+      <!-- Pievienots Footer labās puses bloks ar saitēm un UI atjauninājuma laiku -->
+      <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:24px;">
+        <div class="footer-links">
+          <span class="footer-links-title">Ātrās saites</span>
+          <a href="#" data-open="profile">Spēlētāja profils un iestatījumi</a>
+          <a href="https://www.hokejam.lv/" target="_blank" rel="noopener">Hokejam.lv</a>
+          <a href="https://hokejapasaule.lv/" target="_blank" rel="noopener">Hokeja Pasaule</a>
+          <a href="https://www.sportega.lv/" target="_blank" rel="noopener">Sportega</a>
+        </div>
+        <div class="footer-links" style="align-items:flex-end; text-align:right;">
+          <span class="footer-links-title">Lapas versija</span>
+          <span style="font-size:12px; color:var(--muted); line-height:1.5;">
+            Lapas (UI) atjauninājums:<br>
+            <b style="color:var(--text);">28.10.2026 21:30</b>
+          </span>
+        </div>
       </div>
+      <!-- Footer labās puses beigas -->
+      
     </div>
     <div class="footer-bottom">
       <div class="footer-copy">© 2026 HOCKEY SKATE RADAR. Visas tiesības aizsargātas.</div>
@@ -354,7 +350,9 @@ footer.bar{position:relative;margin-top:70px;background:var(--footer-bg);border-
 </footer>
 
 <script>
-// --- MODEĻU SPECIFIKĀCIJA UN DINAMISKAIS ATBILSTĪBAS INDEKSS ---
+// Pievienots mainīgais datu atjaunināšanas laikam
+let LAST_DATA_UPDATE = 'Tiek ielādēts...';
+
 const MODELS = [
   {
     id: 'bauer-vapor-fly40',
@@ -400,7 +398,6 @@ let OFFERS = [
   { model: 'bauer-supreme-f40',  retailer: 'sp', section: 'new', price: null, oldPrice: null, shipping: 4,    sizes: ['7','7.5'], fits: ['FIT 3'],         stock: false, checked: null,         url: 'https://www.sportega.lv/hladat?q=Supreme+F40', status: 'DEMO' },
   { model: 'bauer-supreme-m40',  retailer: 'hp', section: 'new', price: 349, oldPrice: 463,  shipping: 3.5,  sizes: ['7','7.5'], fits: ['FIT 2'],         stock: true,  checked: '2026-10-28', url: 'https://hokejapasaule.lv/lv_lv/bauer-supreme-s24-m40-senior-hokeja-slidas', status: 'VERIFIED' },
   { model: 'bauer-supreme-m40',  retailer: 'hj', section: 'new', price: 416.49, oldPrice: 489.99, shipping: 0, sizes: ['7','7.5'], fits: ['FIT 2'],      stock: true,  checked: '2026-10-28', url: 'https://www.hokejam.lv/lv/pieauguso-hokeja-slidas/4507-bauer-supreme-m40-pieauguso-hokeja-slidas', status: 'VERIFIED' },
-  // MAINĪTS: Nomainīta Sportega M40 tiešā adrese
   { model: 'bauer-supreme-m40',  retailer: 'sp', section: 'new', price: null, oldPrice: null, shipping: null, sizes: ['8'],      fits: ['FIT 2'],         stock: false, checked: null,         url: 'https://www.sportega.lv/hokeja-slidas-bauer-supreme-m40-senior/d1438036', status: 'DEMO' }
 ];
 
@@ -554,30 +551,38 @@ function storeCard(m, rKey) {
   }
 }
 
-// MAINĪTS: Pārveidots table() funkcijas kods, lai izceltu labāko cenu ar zaļu apmali un "Labākā cena" birku.
 function table(list) {
   const rs = Object.keys(RETAILERS);
   const head = rs.map(k => `<th>${RETAILERS[k].name}</th>`).join('');
+  
   const body = MODELS.map(m => {
-    // 1. Atrodam minimālo cenu (tikai tiem, kas ir noliktavā un ar norādītu cenu)
+    // Aprēķinām labāko pieejamo cenu starp visiem veikaliem šim modelim
     const modelOffers = list.filter(x => x.model === m.id && x.price != null && x.stock);
-    const minTotal = modelOffers.length > 0 ? Math.min(...modelOffers.map(x => total(x))) : null;
+    const minPrice = modelOffers.length ? Math.min(...modelOffers.map(x => total(x))) : null;
 
     const cells = rs.map(k => {
       const o = list.find(x => x.model === m.id && x.retailer === k);
-      if (o && o.price != null) {
-        const t = total(o);
-        // 2. Pārbaudām, vai šis piedāvājums ir lētākais šim modelim
-        const isBest = (minTotal !== null && t === minTotal && o.stock);
-        const cellClass = isBest ? ' class="best-price"' : '';
-        const bestBadge = isBest ? '<span class="best-badge">★ Labākā cena</span>' : '';
+      if (o && o.price != null && o.stock) {
+        const tPrice = total(o);
+        const isBest = (minPrice !== null && tPrice === minPrice);
         
-        return `<td${cellClass}>${bestBadge}<b>${eur(t)}</b><br><small>${(o.sizes||[]).join(', ')} · ${(o.fits||[]).join(', ')}</small></td>`;
+        // Pievienots stils, ja cena ir pati izdevīgākā
+        const cellStyle = isBest ? `background:rgba(52,211,153,0.1); outline:2px solid var(--green); outline-offset:-2px; border-radius:6px; position:relative;` : ``;
+        const bestLabel = isBest ? `<div style="display:inline-block; background:var(--green); color:#000; font-size:9px; font-weight:900; padding:2px 6px; border-radius:4px; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.05em;">★ Labākā cena</div><br>` : ``;
+        const valColor = isBest ? `color:var(--green);` : ``;
+
+        return `<td style="${cellStyle}">
+                  ${bestLabel}
+                  <b style="font-size:16px; ${valColor}">${eur(tPrice)}</b><br>
+                  <small style="color:var(--muted)">${(o.sizes||[]).join(', ')} · ${(o.fits||[]).join(', ')}</small>
+                </td>`;
+      } else {
+        return `<td><span class="badge b-no">Nav datu / filtrs</span></td>`;
       }
-      return `<td><span class="badge b-no">Nav datu / filtrs</span></td>`;
     }).join('');
-    return `<tr><td><b>${m.brand} ${m.name}</b></td>${cells}</tr>`;
+    return `<tr><td><b style="font-size:14px">${m.brand} ${m.name}</b></td>${cells}</tr>`;
   }).join('');
+  
   return `<div class="tw"><table><tr><th>Modelis</th>${head}</tr>${body}</table></div>`;
 }
 
@@ -621,7 +626,14 @@ function viewNew() {
     </div>
   `).join('');
 
-  return `<h1>Jaunas slidas Latvijā</h1>
+  // Pievienots augšējais datu atjauninājuma laiks pretī virsrakstam
+  return `<div style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:14px; margin-top:36px; margin-bottom:10px;">
+    <h1 style="margin:0;">Jaunas slidas Latvijā</h1>
+    <div style="text-align:right; font-size:12px; color:var(--muted); padding-bottom:4px;">
+       Preču datu atjauninājums:<br>
+       <b style="color:var(--text); font-size:14px; font-family:monospace;">${LAST_DATA_UPDATE}</b>
+    </div>
+  </div>
   <p class="sub">Hokeja Pasaule, Hokejam.lv, Sportega. Profila iestatījumi: <b>${ROLES[PROFILE.role]}</b>, izmēri <b>${SIZE_LABELS[PROFILE.size] || PROFILE.size}</b>, prioritāte <b>${PROFILE.fit}</b>.</p>
   <div class="sum">
     <div><small>Labākais pārbaudītais</small><b>${best ? eur(total(best)) : 'Nav pārbaudītu datu'}</b></div>
@@ -761,8 +773,25 @@ async function loadScrapedData() {
     if (!response.ok) throw new Error('scraped_data.json nav pieejams');
     
     const liveData = await response.json();
-    if (Array.isArray(liveData) && liveData.length > 0) {
-      liveData.forEach(item => {
+    let offersArray = [];
+
+    // Jaunais datu formāts, ko sūta scraper.py (ietver laiku)
+    if (liveData && liveData.offers && Array.isArray(liveData.offers)) {
+      offersArray = liveData.offers;
+      if (liveData.updatedAt) {
+        const d = new Date(liveData.updatedAt);
+        // Formāts: DD.MM.YYYY HH:MM
+        LAST_DATA_UPDATE = ('0'+d.getDate()).slice(-2) + '.' + ('0'+(d.getMonth()+1)).slice(-2) + '.' + d.getFullYear() + ' ' + ('0'+d.getHours()).slice(-2) + ':' + ('0'+d.getMinutes()).slice(-2);
+      }
+    } 
+    // Vecais formāts (tikai masīvs - fallback)
+    else if (Array.isArray(liveData)) {
+      offersArray = liveData;
+      LAST_DATA_UPDATE = 'Vecs JSON (bez laika)';
+    }
+
+    if (offersArray.length > 0) {
+      offersArray.forEach(item => {
         const idx = OFFERS.findIndex(o => o.model === item.model && o.retailer === item.retailer);
         if (idx !== -1) {
           OFFERS[idx] = { ...OFFERS[idx], ...item };
@@ -771,7 +800,7 @@ async function loadScrapedData() {
         }
       });
       DATA_SYNC_SOURCE = 'GITHUB ACTIONS (LIVE)';
-      render();
+      render(); // Pārzīmējam lapu pēc īsto datu ielādes!
     }
   } catch (err) {
     console.info('Izmanto noklusētos datus:', err.message);
