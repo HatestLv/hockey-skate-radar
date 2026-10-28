@@ -53,7 +53,7 @@
     ],
     "stock": false,
     "checked": null,
-    "url": "https://www.sportega.lv/hladat?q=Vapor+FLY40",
+    "url": "https://www.sportega.lv/hladat?q=Bauer+Vapor",
     "status": "DEMO"
   },
   {
@@ -79,8 +79,8 @@
     "model": "bauer-supreme-f40",
     "retailer": "hj",
     "section": "new",
-    "price": null,
-    "oldPrice": null,
+    "price": 475.99,
+    "oldPrice": 559.99,
     "shipping": 0.0,
     "sizes": [
       "7",
@@ -89,10 +89,10 @@
     "fits": [
       "FIT 2"
     ],
-    "stock": false,
-    "checked": null,
-    "url": "https://www.hokejam.lv/lv/search?s=Supreme+F40",
-    "status": "DEMO"
+    "stock": true,
+    "checked": "2026-10-28",
+    "url": "https://www.hokejam.lv/lv/pieauguso-hokeja-slidas/5455-bauer-supreme-f40-s26-pieauguso-hokeja-slidas",
+    "status": "VERIFIED"
   },
   {
     "model": "bauer-supreme-f40",
