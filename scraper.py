@@ -3,11 +3,8 @@
 """
 HOCKEY SKATE RADAR — Datu vākšanas un sinhronizācijas skripts
 --------------------------------------------------------------
-Šis skripts automātiski skenē Latvijas hokeja veikalus:
-  - Hokeja Pasaule (Magento)
-  - Hokejam.lv (PrestaShop)
-  - Sportega
-Iegūst reālās cenas, atlaides, pieejamību un saglabā 'scraped_data.json'.
+Skenē Latvijas hokeja veikalus (Hokeja Pasaule, Hokejam.lv, Sportega),
+precīzi nolasot cenas un pieejamību konkrētajā preces pirkšanas blokā.
 """
 
 import json
@@ -23,8 +20,7 @@ try:
     import requests
     from bs4 import BeautifulSoup
 except ImportError:
-    print("KĻŪDA: Trūkst nepieciešamo bibliotēku.")
-    print("Instalē tās ar: pip install requests beautifulsoup4")
+    print("KĻŪDA: Trūkst bibliotēku. Palaid: pip install requests beautifulsoup4")
     sys.exit(1)
 
 logging.basicConfig(
@@ -33,7 +29,6 @@ logging.basicConfig(
     handlers=[logging.StreamHandler(sys.stdout)]
 )
 
-# Pārlūka galvenes, lai veikali neatraidītu pieprasījumus
 HTTP_HEADERS = {
     "User-Agent": (
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
@@ -51,29 +46,28 @@ RETAILERS = {
     "sp": {"name": "Sportega",       "shipping": 4.00, "base_url": "https://www.sportega.lv"},
 }
 
-# Reālās veikalu produktu un meklēšanas saites
 TARGET_SKATES = [
     {
         "id": "bauer-vapor-fly40",
         "name": "Bauer Vapor FLY40",
         "urls": {
-            # Hokeja Pasaule tiešā produkta lapa
+            # Hokeja Pasaule tiešā pieaugušo preces lapa
             "hp": "https://hokejapasaule.lv/lv_lv/bauer-vapor-s25-fly40-senior-hokeja-slidas",
-            # Hokejam.lv Vapor meklēšanas/kataloga saite
+            # Hokejam.lv meklēšanas lapa Vapor FLY40
             "hj": "https://www.hokejam.lv/lv/search?s=Vapor+FLY40",
-            # Sportega meklēšanas saite
-            "sp": "https://www.sportega.lv/hladat?q=Vapor+FLY40",
+            # Sportega meklēšanas lapa
+            "sp": "https://www.sportega.lv/hladat?q=Bauer+Vapor",
         }
     },
     {
         "id": "bauer-supreme-f40",
         "name": "Bauer Supreme F40",
         "urls": {
-            # Hokeja Pasaule tiešā produkta lapa
+            # Hokeja Pasaule tiešā pieaugušo preces lapa
             "hp": "https://hokejapasaule.lv/lv_lv/bauer-supreme-s26-f40-senior-hokeja-slidas",
-            # Hokejam.lv Supreme F sērijas saite
-            "hj": "https://www.hokejam.lv/lv/search?s=Supreme+F40",
-            # Sportega meklēšanas saite
+            # Hokejam.lv tiešā pieaugušo preces lapa
+            "hj": "https://www.hokejam.lv/lv/pieauguso-hokeja-slidas/5455-bauer-supreme-f40-s26-pieauguso-hokeja-slidas",
+            # Sportega meklēšanas lapa
             "sp": "https://www.sportega.lv/hladat?q=Supreme+F40",
         }
     },
@@ -81,11 +75,11 @@ TARGET_SKATES = [
         "id": "bauer-supreme-m40",
         "name": "Bauer Supreme M40",
         "urls": {
-            # Hokeja Pasaule tiešā produkta lapa
+            # Hokeja Pasaule tiešā pieaugušo preces lapa
             "hp": "https://hokejapasaule.lv/lv_lv/bauer-supreme-s24-m40-senior-ice-hockey-skates",
-            # Hokejam.lv tiešā produkta lapa
+            # Hokejam.lv tiešā pieaugušo preces lapa
             "hj": "https://www.hokejam.lv/lv/pieauguso-hokeja-slidas/4507-bauer-supreme-m40-pieauguso-hokeja-slidas",
-            # Sportega meklēšanas saite
+            # Sportega meklēšanas lapa
             "sp": "https://www.sportega.lv/hladat?q=Supreme+M40",
         }
     }
@@ -98,7 +92,6 @@ class HockeySkateScraper:
         self.session.headers.update(HTTP_HEADERS)
 
     def fetch_page(self, url: str) -> Optional[BeautifulSoup]:
-        """Veic drošu pieprasījumu ar kļūdu pārtveršanu."""
         try:
             logging.info(f"Pārbauda saiti: {url}")
             response = self.session.get(url, timeout=14)
@@ -111,11 +104,9 @@ class HockeySkateScraper:
             return None
 
     def clean_price(self, text: Optional[str]) -> Optional[float]:
-        """Iztīra tekstu '535,00 €' vai '€ 416.49' un atgriež skaitli."""
         if not text:
             return None
         cleaned = re.sub(r"[^\d,\.]", "", text).replace(",", ".")
-        # Ja ir vairāki punkti (piemēram 1.099.00), atstājam pēdējo
         if cleaned.count(".") > 1:
             parts = cleaned.split(".")
             cleaned = "".join(parts[:-1]) + "." + parts[-1]
@@ -126,8 +117,6 @@ class HockeySkateScraper:
             return None
 
     def extract_meta_price(self, soup: BeautifulSoup) -> Optional[float]:
-        """Universāls meklētājs e-veikalu strukturētajos datos (Schema.org / OpenGraph)."""
-        # 1. itemprop="price"
         itemprop = soup.find(attrs={"itemprop": "price"})
         if itemprop:
             content = itemprop.get("content") or itemprop.text
@@ -135,7 +124,6 @@ class HockeySkateScraper:
             if p:
                 return p
 
-        # 2. meta property="product:price:amount"
         meta_og = soup.find("meta", property=re.compile(r"price:amount$", re.I))
         if meta_og and meta_og.get("content"):
             p = self.clean_price(meta_og["content"])
@@ -145,10 +133,9 @@ class HockeySkateScraper:
         return None
 
     def parse_hokeja_pasaule(self, soup: BeautifulSoup, target_url: str) -> Dict:
-        """Parseris priekš Hokeja Pasaule (Magento 2 bāze)."""
         res = {"price": None, "oldPrice": None, "stock": False, "sizes": ["7", "7.5"], "fits": ["FIT 2"], "url": target_url}
 
-        # 1. Tiešās produkta lapas cena no mikrodatiem vai Magento cenu blokiem
+        # 1. Cenas nolasīšana
         res["price"] = self.extract_meta_price(soup)
 
         if not res["price"]:
@@ -160,28 +147,26 @@ class HockeySkateScraper:
         if old_box:
             res["oldPrice"] = self.clean_price(old_box.text)
 
-        # 2. Ja tā ir saraksta/meklēšanas lapa
-        if not res["price"]:
-            item = soup.select_one(".product-item-info, .product-layout, .product-thumb")
-            if item:
-                link = item.select_one("a[href]")
-                if link and link.get("href"):
-                    res["url"] = link["href"]
-                p_elem = item.select_one("[data-price-type='finalPrice'] .price, .price")
-                if p_elem:
-                    res["price"] = self.clean_price(p_elem.text)
-
-        # Pieejamības pārbaude
+        # 2. Precīza pieejamības noteikšana (tikai produkta blokā)
         if res["price"]:
-            body_text = soup.get_text().lower()
-            # Pārbauda vai nav skaidri norādīts "nav noliktavā"
-            is_out = "nav noliktavā" in body_text or "out of stock" in body_text
-            res["stock"] = not is_out
+            prod_info = soup.select_one(".product-info-main, .product-add-form") or soup
+            info_text = prod_info.get_text().lower()
+
+            # Pārbauda "Ir noliktavā" vai groza pogu
+            has_add_button = prod_info.select_one("#product-addtocart-button, button.tocart, .action.tocart") is not None
+            has_stock_tag = "ir noliktavā" in info_text or "in stock" in info_text
+
+            # Ja ir poga vai skaidrs noliktavas paziņojums, prece IR pieejama
+            if has_add_button or has_stock_tag:
+                res["stock"] = True
+            elif "nav noliktavā" in info_text:
+                res["stock"] = False
+            else:
+                res["stock"] = True
 
         return res
 
     def parse_hokejam_lv(self, soup: BeautifulSoup, target_url: str) -> Dict:
-        """Parseris priekš Hokejam.lv (PrestaShop bāze)."""
         res = {"price": None, "oldPrice": None, "stock": False, "sizes": ["7", "7.5"], "fits": ["FIT 2"], "url": target_url}
 
         res["price"] = self.extract_meta_price(soup)
@@ -195,7 +180,7 @@ class HockeySkateScraper:
         if old_box:
             res["oldPrice"] = self.clean_price(old_box.text)
 
-        # Ja tā ir meklēšanas/saraksta lapa
+        # Ja tā ir meklēšanas lapa, meklē pirmo atbilstošo Senior preci
         if not res["price"]:
             item = soup.select_one(".product-miniature, .product-item, .item-inner")
             if item:
@@ -207,12 +192,17 @@ class HockeySkateScraper:
                     res["price"] = self.clean_price(p_elem.text)
 
         if res["price"]:
-            res["stock"] = True
+            # PrestaShop pieejamības bloks
+            avail_elem = soup.select_one("#product-availability, .product-availability")
+            if avail_elem:
+                txt = avail_elem.get_text().lower()
+                res["stock"] = "nav" not in txt and "out" not in txt
+            else:
+                res["stock"] = True
 
         return res
 
     def parse_sportega(self, soup: BeautifulSoup, target_url: str) -> Dict:
-        """Parseris priekš Sportega."""
         res = {"price": None, "oldPrice": None, "stock": False, "sizes": ["7", "7.5"], "fits": ["FIT 2"], "url": target_url}
 
         res["price"] = self.extract_meta_price(soup)
@@ -226,7 +216,6 @@ class HockeySkateScraper:
         if old_elem:
             res["oldPrice"] = self.clean_price(old_elem.text)
 
-        # Meklēšanas saraksta lapa
         if not res["price"]:
             item = soup.select_one(".c-product-box, .product-box")
             if item:
@@ -255,7 +244,7 @@ class HockeySkateScraper:
 
             for r_key, url in skate["urls"].items():
                 ret_info = RETAILERS[r_key]
-                time.sleep(1.0)  # Saudzīga pauze starp pieprasījumiem
+                time.sleep(1.0)
 
                 soup = self.fetch_page(url)
                 parsed = {}
@@ -268,7 +257,7 @@ class HockeySkateScraper:
                     elif r_key == "sp":
                         parsed = self.parse_sportega(soup, url)
 
-                is_verified = parsed.get("price") is not None
+                is_verified = parsed.get("price") is not None and parsed.get("stock", False)
 
                 offer = {
                     "model": model_id,
