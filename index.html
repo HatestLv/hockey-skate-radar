@@ -31,10 +31,6 @@
   --btn-bg:#0e0f13;
   --btn-hover:#12141a;
   --btn-zero-bg:#090a0d;
-  --nav-btn-bg:linear-gradient(#272b37,#1a1d25);
-  --nav-btn-border:#343949;
-  --nav-btn-on-bg:#0f1116;
-  --nav-btn-on-border:#1b1e27;
   --footer-bg:linear-gradient(#0a0b0e,#13151c);
   --img-grad:radial-gradient(ellipse at 50% 85%,#2e3342,var(--card) 70%);
   --switch-bg:#15171e;
@@ -64,10 +60,6 @@
   --btn-bg:#f8fafc;
   --btn-hover:#f1f5f9;
   --btn-zero-bg:#f8fafc;
-  --nav-btn-bg:linear-gradient(#ffffff,#f1f5f9);
-  --nav-btn-border:#cbd5e1;
-  --nav-btn-on-bg:#ffffff;
-  --nav-btn-on-border:#94a3b8;
   --footer-bg:linear-gradient(#f8fafc,#edf2f7);
   --img-grad:radial-gradient(ellipse at 50% 85%,#e2e8f0,#ffffff 70%);
   --switch-bg:#e2e8f0;
@@ -82,19 +74,53 @@ body{margin:0;background:var(--body-bg);background-attachment:fixed;color:var(--
 a{color:var(--link)}
 .wrap{max-width:1100px;margin:0 auto;padding:0 16px}
 header{position:relative;z-index:5;background:var(--header-bg);border-bottom:2px solid var(--header-border);box-shadow:0 8px 24px var(--shadow-header);transition:all .2s ease}
-header .wrap{display:flex;align-items:center;gap:24px;flex-wrap:wrap;padding-top:20px;padding-bottom:20px}
+header .wrap{display:flex;align-items:center;gap:20px;flex-wrap:wrap;padding-top:16px;padding-bottom:16px}
 .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--text);font-weight:900;letter-spacing:.04em;font-size:18px}
-.brand-logo-wrap{display:flex;align-items:center;min-height:80px}
-.brand-logo{height:clamp(68px,6vw,82px);width:auto;max-width:360px;object-fit:contain;display:block}
+.brand-logo-wrap{display:flex;align-items:center;min-height:70px}
+.brand-logo{height:clamp(62px,5.5vw,76px);width:auto;max-width:340px;object-fit:contain;display:block}
 [data-theme="light"] .brand-logo{filter:drop-shadow(0 2px 4px rgba(0,0,0,.35))}
 .brand-logo-err{display:none;border:1px dashed var(--red);background:rgba(237,32,39,.12);color:#fca5a5;padding:6px 12px;border-radius:6px;font-size:12px;font-family:monospace;gap:6px;align-items:center}
 .brand-text{display:inline-flex;align-items:center;gap:10px}
 .brand-icon{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;background:#ed2027;color:#fff;border-radius:8px;box-shadow:0 0 14px rgba(237,32,39,.45)}
-nav{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
-nav button{background:var(--nav-btn-bg);border:1px solid var(--nav-btn-border);color:var(--muted);padding:11px 20px;border-radius:10px;font:inherit;font-weight:700;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.15),0 5px 8px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.09);transition:all .15s}
-nav button:not(.on):hover{color:var(--text);transform:translateY(-1px)}
-nav button.on{background:var(--nav-btn-on-bg);border-color:var(--nav-btn-on-border);color:var(--text);transform:translateY(3px);box-shadow:inset 0 3px 8px rgba(0,0,0,.3),inset 0 -3px 0 var(--red)}
-.header-actions{margin-left:auto;display:flex;align-items:center;gap:12px}
+
+/* NAVIGĀCIJAS POGAS - PĀRVEIDOTAS TĀDĀ PAŠĀ KOMPAKTĀ STILĀ KĀ MENU UN TĒMAS POGAS */
+nav{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+nav button{
+  background:var(--switch-bg);
+  border:1px solid var(--switch-border);
+  color:var(--muted);
+  height:34px;
+  padding:0 14px;
+  border-radius:10px;
+  font:inherit;
+  font-size:14px;
+  font-weight:700;
+  cursor:pointer;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:none;
+  transition:all .2s ease;
+  outline:none;
+}
+nav button:not(.on):hover{
+  color:var(--red);
+  border-color:var(--red);
+  transform:scale(1.04);
+}
+nav button.on{
+  background:rgba(237,32,39,.12);
+  border-color:var(--red);
+  color:var(--text);
+  box-shadow:0 0 10px rgba(237,32,39,.2);
+}
+[data-theme="light"] nav button.on{
+  background:rgba(237,32,39,.08);
+  border-color:var(--red);
+  color:var(--red);
+}
+
+.header-actions{margin-left:auto;display:flex;align-items:center;gap:10px}
 .theme-box{display:flex;align-items:center}
 .theme-switch{position:relative;width:66px;height:34px;border-radius:99px;background:var(--switch-bg);border:1px solid var(--switch-border);display:flex;align-items:center;justify-content:space-between;padding:0 7px;cursor:pointer;box-shadow:inset 0 2px 4px rgba(0,0,0,.25);transition:all .2s ease;outline:none}
 .theme-switch:hover{transform:scale(1.05);border-color:var(--red)}
@@ -133,8 +159,8 @@ nav button.on{background:var(--nav-btn-on-bg);border-color:var(--nav-btn-on-bord
 .meter{position:relative;height:8px;border-radius:99px;background:linear-gradient(90deg,#ef4444,#f59e0b 50%,#34d399)}
 .meter i{position:absolute;top:-4px;width:4px;height:16px;border-radius:2px;background:#fff;transform:translateX(-50%);box-shadow:0 0 0 2px var(--card)}
 #f-sort{width:auto;max-width:160px;text-overflow:ellipsis}
-h1{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-weight:800;font-size:clamp(30px,4.5vw,44px);line-height:1.15;letter-spacing:-.02em}
-.sub{color:var(--muted);font-size:clamp(15px,1.5vw,18px);line-height:1.5;margin:0 0 22px}
+h1{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-weight:800;font-size:clamp(28px,4vw,40px);line-height:1.15;letter-spacing:-.02em}
+.sub{color:var(--muted);font-size:clamp(14px,1.4vw,17px);line-height:1.5;margin:0 0 20px}
 .sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:16px}
 .sum div{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
 .sum small{display:block;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em}
@@ -261,7 +287,10 @@ footer.bar{position:relative;margin-top:70px;background:var(--footer-bg);border-
         <span>HOCKEY SKATE RADAR</span>
       </span>
     </a>
+    
+    <!-- Navigācija -->
     <nav id="nav"></nav>
+
     <div class="header-actions">
       <div class="theme-box">
         <button id="theme-toggle" class="theme-switch" type="button" aria-label="Pārslēgt tumšo vai gaišo režīmu" title="Pārslēgt tumšo / gaišo režīmu">
@@ -320,7 +349,7 @@ footer.bar{position:relative;margin-top:70px;background:var(--footer-bg);border-
         </p>
       </div>
       
-      <!-- Pievienots Footer labās puses bloks ar saitēm un UI atjauninājuma laiku -->
+      <!-- Footer labā puse -->
       <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:24px;">
         <div class="footer-links">
           <span class="footer-links-title">Ātrās saites</span>
@@ -333,11 +362,10 @@ footer.bar{position:relative;margin-top:70px;background:var(--footer-bg);border-
           <span class="footer-links-title">Lapas versija</span>
           <span style="font-size:12px; color:var(--muted); line-height:1.5;">
             Lapas (UI) atjauninājums:<br>
-            <b style="color:var(--text);">28.10.2026 21:30</b>
+            <b style="color:var(--text);">28.10.2026 21:50</b>
           </span>
         </div>
       </div>
-      <!-- Footer labās puses beigas -->
       
     </div>
     <div class="footer-bottom">
@@ -350,8 +378,7 @@ footer.bar{position:relative;margin-top:70px;background:var(--footer-bg);border-
 </footer>
 
 <script>
-// Pievienots mainīgais datu atjaunināšanas laikam
-let LAST_DATA_UPDATE = 'Tiek ielādēts...';
+let LAST_DATA_UPDATE = 'Tiek sinhronizēts...';
 
 const MODELS = [
   {
@@ -389,16 +416,19 @@ const RETAILERS = {
   sp: { id: 'sp', name: 'Sportega',       file: 'sportega',       url: 'https://www.sportega.lv/' }
 };
 
+// Pārbaudītie pamata dati ar visām tiešajām saitēm
 let OFFERS = [
   { model: 'bauer-vapor-fly40',  retailer: 'hp', section: 'new', price: 535, oldPrice: null, shipping: 3.5,  sizes: ['7','7.5'], fits: ['FIT 2'],         stock: true,  checked: '2026-10-28', url: 'https://hokejapasaule.lv/lv_lv/bauer-vapor-s25-fly40-senior-hokeja-slidas', status: 'VERIFIED' },
   { model: 'bauer-vapor-fly40',  retailer: 'hj', section: 'new', price: null, oldPrice: null, shipping: 0,    sizes: ['7.5','8'], fits: ['FIT 2'],         stock: false, checked: null,         url: 'https://www.hokejam.lv/lv/search?s=Vapor+FLY40', status: 'DEMO' },
   { model: 'bauer-vapor-fly40',  retailer: 'sp', section: 'new', price: 535, oldPrice: null, shipping: 4,    sizes: ['7','7.5'], fits: ['FIT 2'],         stock: true,  checked: '2026-10-28', url: 'https://www.sportega.lv/hokeja-slidas-bauer-vapor-fly40-senior/d1502757', status: 'VERIFIED' },
+  
   { model: 'bauer-supreme-f40',  retailer: 'hp', section: 'new', price: 535, oldPrice: null, shipping: 3.5,  sizes: ['7','7.5'], fits: ['FIT 2'],         stock: true,  checked: '2026-10-28', url: 'https://hokejapasaule.lv/lv_lv/bauer-supreme-s26-f40-senior-hokeja-slidas', status: 'VERIFIED' },
   { model: 'bauer-supreme-f40',  retailer: 'hj', section: 'new', price: 475.99, oldPrice: 559.99, shipping: 0, sizes: ['7.5'],  fits: ['FIT 2'],         stock: true,  checked: '2026-10-28', url: 'https://www.hokejam.lv/lv/pieauguso-hokeja-slidas/5455-bauer-supreme-f40-s26-pieauguso-hokeja-slidas', status: 'VERIFIED' },
-  { model: 'bauer-supreme-f40',  retailer: 'sp', section: 'new', price: null, oldPrice: null, shipping: 4,    sizes: ['7','7.5'], fits: ['FIT 3'],         stock: false, checked: null,         url: 'https://www.sportega.lv/hladat?q=Supreme+F40', status: 'DEMO' },
+  { model: 'bauer-supreme-f40',  retailer: 'sp', section: 'new', price: 535, oldPrice: null, shipping: 4,    sizes: ['7','7.5'], fits: ['FIT 2'],         stock: true,  checked: '2026-10-28', url: 'https://www.sportega.lv/hokeja-slidas-bauer-supreme-f40-senior/d1583973', status: 'VERIFIED' },
+  
   { model: 'bauer-supreme-m40',  retailer: 'hp', section: 'new', price: 349, oldPrice: 463,  shipping: 3.5,  sizes: ['7','7.5'], fits: ['FIT 2'],         stock: true,  checked: '2026-10-28', url: 'https://hokejapasaule.lv/lv_lv/bauer-supreme-s24-m40-senior-hokeja-slidas', status: 'VERIFIED' },
   { model: 'bauer-supreme-m40',  retailer: 'hj', section: 'new', price: 416.49, oldPrice: 489.99, shipping: 0, sizes: ['7','7.5'], fits: ['FIT 2'],      stock: true,  checked: '2026-10-28', url: 'https://www.hokejam.lv/lv/pieauguso-hokeja-slidas/4507-bauer-supreme-m40-pieauguso-hokeja-slidas', status: 'VERIFIED' },
-  { model: 'bauer-supreme-m40',  retailer: 'sp', section: 'new', price: null, oldPrice: null, shipping: null, sizes: ['8'],      fits: ['FIT 2'],         stock: false, checked: null,         url: 'https://www.sportega.lv/hokeja-slidas-bauer-supreme-m40-senior/d1438036', status: 'DEMO' }
+  { model: 'bauer-supreme-m40',  retailer: 'sp', section: 'new', price: 349.99, oldPrice: null, shipping: 4, sizes: ['7','7.5','8'], fits: ['FIT 2'],    stock: true,  checked: '2026-10-28', url: 'https://www.sportega.lv/hokeja-slidas-bauer-supreme-m40-senior/d1438036', status: 'VERIFIED' }
 ];
 
 let DATA_SYNC_SOURCE = 'LOKĀLIE DATI';
@@ -415,7 +445,7 @@ const DEFAULT_PROFILE = {
   size: 'pref',
   fit: 'FIT 2',
   min: 300,
-  max: 600,
+  max: 650,
   prefModel: 'all',
   level: 'amateur'
 };
@@ -556,7 +586,6 @@ function table(list) {
   const head = rs.map(k => `<th>${RETAILERS[k].name}</th>`).join('');
   
   const body = MODELS.map(m => {
-    // Aprēķinām labāko pieejamo cenu starp visiem veikaliem šim modelim
     const modelOffers = list.filter(x => x.model === m.id && x.price != null && x.stock);
     const minPrice = modelOffers.length ? Math.min(...modelOffers.map(x => total(x))) : null;
 
@@ -566,7 +595,6 @@ function table(list) {
         const tPrice = total(o);
         const isBest = (minPrice !== null && tPrice === minPrice);
         
-        // Pievienots stils, ja cena ir pati izdevīgākā
         const cellStyle = isBest ? `background:rgba(52,211,153,0.1); outline:2px solid var(--green); outline-offset:-2px; border-radius:6px; position:relative;` : ``;
         const bestLabel = isBest ? `<div style="display:inline-block; background:var(--green); color:#000; font-size:9px; font-weight:900; padding:2px 6px; border-radius:4px; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.05em;">★ Labākā cena</div><br>` : ``;
         const valColor = isBest ? `color:var(--green);` : ``;
@@ -626,7 +654,6 @@ function viewNew() {
     </div>
   `).join('');
 
-  // Pievienots augšējais datu atjauninājuma laiks pretī virsrakstam
   return `<div style="display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:14px; margin-top:36px; margin-bottom:10px;">
     <h1 style="margin:0;">Jaunas slidas Latvijā</h1>
     <div style="text-align:right; font-size:12px; color:var(--muted); padding-bottom:4px;">
@@ -775,17 +802,13 @@ async function loadScrapedData() {
     const liveData = await response.json();
     let offersArray = [];
 
-    // Jaunais datu formāts, ko sūta scraper.py (ietver laiku)
     if (liveData && liveData.offers && Array.isArray(liveData.offers)) {
       offersArray = liveData.offers;
       if (liveData.updatedAt) {
         const d = new Date(liveData.updatedAt);
-        // Formāts: DD.MM.YYYY HH:MM
         LAST_DATA_UPDATE = ('0'+d.getDate()).slice(-2) + '.' + ('0'+(d.getMonth()+1)).slice(-2) + '.' + d.getFullYear() + ' ' + ('0'+d.getHours()).slice(-2) + ':' + ('0'+d.getMinutes()).slice(-2);
       }
-    } 
-    // Vecais formāts (tikai masīvs - fallback)
-    else if (Array.isArray(liveData)) {
+    } else if (Array.isArray(liveData)) {
       offersArray = liveData;
       LAST_DATA_UPDATE = 'Vecs JSON (bez laika)';
     }
@@ -794,13 +817,16 @@ async function loadScrapedData() {
       offersArray.forEach(item => {
         const idx = OFFERS.findIndex(o => o.model === item.model && o.retailer === item.retailer);
         if (idx !== -1) {
-          OFFERS[idx] = { ...OFFERS[idx], ...item };
-        } else {
+          // Ja scraper atgriež derīgu cenu, atjaunojam to
+          if (item.price && item.price > 0) {
+            OFFERS[idx] = { ...OFFERS[idx], ...item };
+          }
+        } else if (item.price && item.price > 0) {
           OFFERS.push(item);
         }
       });
       DATA_SYNC_SOURCE = 'GITHUB ACTIONS (LIVE)';
-      render(); // Pārzīmējam lapu pēc īsto datu ielādes!
+      render();
     }
   } catch (err) {
     console.info('Izmanto noklusētos datus:', err.message);
