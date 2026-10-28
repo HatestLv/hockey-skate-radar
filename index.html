@@ -1,843 +1,741 @@
 <!DOCTYPE html>
-<html lang="lv">
+<html lang="lv" data-theme="dark">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>HOCKEY SKATE RADAR — Cenu un modeļu radars</title>
-<script>
-  (function(){
-    const saved = localStorage.getItem('hsr_theme') || 'dark';
-    document.documentElement.setAttribute('data-theme', saved);
-  })();
-</script>
-<style>
-:root, [data-theme="dark"]{
-  --bg:#0e0f13;
-  --card:#181a21;
-  --card-zero:#13151c;
-  --card-hover:#1e212b;
-  --line:#2c303c;
-  --text:#f2f4f8;
-  --muted:#a9b0be;
-  --link:#7dd3fc;
-  --red:#ed2027;
-  --green:#34d399;
-  --amber:#fbbf24;
-  --header-bg:linear-gradient(#13151c,#0a0b0e);
-  --header-border:#3a1015;
-  --notch-bg:linear-gradient(#15171e,#0c0d11);
-  --body-bg:repeating-linear-gradient(45deg,rgba(125,160,200,.055) 0 1px,transparent 1px 7px),repeating-linear-gradient(-45deg,rgba(125,160,200,.04) 0 1px,transparent 1px 10px),radial-gradient(ellipse at 50% 0,#1a1d29,var(--bg) 65%);
-  --input-bg:#0e0f13;
-  --btn-bg:#0e0f13;
-  --btn-hover:#12141a;
-  --btn-zero-bg:#090a0d;
-  --nav-btn-bg:linear-gradient(#272b37,#1a1d25);
-  --nav-btn-border:#343949;
-  --nav-btn-on-bg:#0f1116;
-  --nav-btn-on-border:#1b1e27;
-  --footer-bg:linear-gradient(#0a0b0e,#13151c);
-  --img-grad:radial-gradient(ellipse at 50% 85%,#2e3342,var(--card) 70%);
-  --switch-bg:#15171e;
-  --switch-border:#343949;
-  --store-hover-bg:rgba(255,255,255,.03);
-  --shadow-header:rgba(0,0,0,.55);
-  --profile-card-bg:#181a21;
-}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hockey Skate Radar | Cenu un Pieejamības Salīdzināšana</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-base: #0b1120;
+      --bg-surface: #131d33;
+      --bg-card: #182440;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-accent: rgba(239, 68, 68, 0.4);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent-red: #e11d48;
+      --accent-green: #22c55e;
+      --accent-amber: #f59e0b;
+      --font-main: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --shadow-card: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+    }
 
-[data-theme="light"]{
-  --bg:#f4f6fa;
-  --card:#ffffff;
-  --card-zero:#f8fafc;
-  --card-hover:#f1f5f9;
-  --line:#e2e8f0;
-  --text:#0f172a;
-  --muted:#64748b;
-  --link:#0284c7;
-  --red:#ed2027;
-  --green:#059669;
-  --amber:#d97706;
-  --header-bg:linear-gradient(#ffffff,#f8fafc);
-  --header-border:#fecdd3;
-  --notch-bg:linear-gradient(#ffffff,#f1f5f9);
-  --body-bg:repeating-linear-gradient(45deg,rgba(148,163,184,.07) 0 1px,transparent 1px 7px),repeating-linear-gradient(-45deg,rgba(148,163,184,.05) 0 1px,transparent 1px 10px),radial-gradient(ellipse at 50% 0,#e2e8f0,var(--bg) 70%);
-  --input-bg:#ffffff;
-  --btn-bg:#f8fafc;
-  --btn-hover:#f1f5f9;
-  --btn-zero-bg:#f8fafc;
-  --nav-btn-bg:linear-gradient(#ffffff,#f1f5f9);
-  --nav-btn-border:#cbd5e1;
-  --nav-btn-on-bg:#ffffff;
-  --nav-btn-on-border:#94a3b8;
-  --footer-bg:linear-gradient(#f8fafc,#edf2f7);
-  --img-grad:radial-gradient(ellipse at 50% 85%,#e2e8f0,#ffffff 70%);
-  --switch-bg:#e2e8f0;
-  --switch-border:#cbd5e1;
-  --store-hover-bg:rgba(0,0,0,.03);
-  --shadow-header:rgba(0,0,0,.06);
-  --profile-card-bg:#ffffff;
-}
+    [data-theme="light"] {
+      --bg-base: #f8fafc;
+      --bg-surface: #ffffff;
+      --bg-card: #f1f5f9;
+      --border-color: rgba(0, 0, 0, 0.08);
+      --border-accent: rgba(225, 29, 72, 0.3);
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+    }
 
-*{box-sizing:border-box}
-body{margin:0;background:var(--body-bg);background-attachment:fixed;color:var(--text);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;transition:background-color .2s ease,color .2s ease}
-a{color:var(--link)}
-.wrap{max-width:1100px;margin:0 auto;padding:0 16px}
-header{position:relative;z-index:5;background:var(--header-bg);border-bottom:2px solid var(--header-border);box-shadow:0 8px 24px var(--shadow-header);transition:all .2s ease}
-header .wrap{display:flex;align-items:center;gap:24px;flex-wrap:wrap;padding-top:20px;padding-bottom:20px}
-.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--text);font-weight:900;letter-spacing:.04em;font-size:18px}
-.brand-logo-wrap{display:flex;align-items:center;min-height:80px}
-.brand-logo{height:clamp(68px,6vw,82px);width:auto;max-width:360px;object-fit:contain;display:block}
-[data-theme="light"] .brand-logo{filter:drop-shadow(0 2px 4px rgba(0,0,0,.35))}
-.brand-logo-err{display:none;border:1px dashed var(--red);background:rgba(237,32,39,.12);color:#fca5a5;padding:6px 12px;border-radius:6px;font-size:12px;font-family:monospace;gap:6px;align-items:center}
-.brand-text{display:inline-flex;align-items:center;gap:10px}
-.brand-icon{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;background:#ed2027;color:#fff;border-radius:8px;box-shadow:0 0 14px rgba(237,32,39,.45)}
-nav{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
-nav button{background:var(--nav-btn-bg);border:1px solid var(--nav-btn-border);color:var(--muted);padding:11px 20px;border-radius:10px;font:inherit;font-weight:700;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.15),0 5px 8px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.09);transition:all .15s}
-nav button:not(.on):hover{color:var(--text);transform:translateY(-1px)}
-nav button.on{background:var(--nav-btn-on-bg);border-color:var(--nav-btn-on-border);color:var(--text);transform:translateY(3px);box-shadow:inset 0 3px 8px rgba(0,0,0,.3),inset 0 -3px 0 var(--red)}
-.header-actions{margin-left:auto;display:flex;align-items:center;gap:12px}
-.theme-box{display:flex;align-items:center}
-.theme-switch{position:relative;width:66px;height:34px;border-radius:99px;background:var(--switch-bg);border:1px solid var(--switch-border);display:flex;align-items:center;justify-content:space-between;padding:0 7px;cursor:pointer;box-shadow:inset 0 2px 4px rgba(0,0,0,.25);transition:all .2s ease;outline:none}
-.theme-switch:hover{transform:scale(1.05);border-color:var(--red)}
-.ts-icon{display:grid;place-items:center;z-index:2;transition:opacity .2s,color .2s}
-.ts-thumb{position:absolute;top:3px;left:4px;width:26px;height:26px;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,.35);transition:transform .28s cubic-bezier(.34,1.56,.64,1);z-index:1}
-[data-theme="dark"] .ts-moon{color:#f8fafc;opacity:1}
-[data-theme="dark"] .ts-sun{color:var(--muted);opacity:.35}
-[data-theme="dark"] .ts-thumb{transform:translateX(30px);background:linear-gradient(135deg,#ed2027,#991b1b)}
-[data-theme="light"] .ts-sun{color:#d97706;opacity:1}
-[data-theme="light"] .ts-moon{color:var(--muted);opacity:.35}
-[data-theme="light"] .ts-thumb{transform:translateX(0px);background:linear-gradient(135deg,#fbbf24,#f59e0b)}
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-main);
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
 
-.menu-box{position:relative}
-.menu-btn{background:var(--switch-bg);border:1px solid var(--switch-border);color:var(--text);width:40px;height:34px;border-radius:10px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4.5px;cursor:pointer;padding:0;transition:all .2s ease}
-.menu-btn:hover, .menu-btn.active{border-color:var(--red);color:var(--red);transform:scale(1.04)}
-.menu-btn span{display:block;width:18px;height:2px;background:currentColor;border-radius:2px;transition:all .2s ease}
+    /* HEADER */
+    header {
+      background-color: var(--bg-surface);
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-inner {
+      max-width: 1380px;
+      margin: 0 auto;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-main);
+    }
+    .brand-logo-img {
+      height: 36px;
+      width: auto;
+      display: block;
+    }
+    .brand-text h1 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      text-transform: uppercase;
+    }
+    .brand-text h1 span { color: var(--accent-red); }
+    .brand-text p {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
 
-.dropdown-menu{position:absolute;top:calc(100% + 10px);right:0;width:240px;background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,.35);padding:8px;z-index:99;opacity:0;visibility:hidden;transform:translateY(-8px);transition:all .2s cubic-bezier(.16,1,.3,1)}
-.dropdown-menu.open{opacity:1;visibility:visible;transform:translateY(0)}
-.dropdown-head{padding:6px 10px 8px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--line);margin-bottom:6px}
-.dropdown-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;color:var(--text);text-decoration:none;transition:all .15s ease}
-.dropdown-item:hover{background:var(--card-hover);color:var(--red)}
-.dropdown-item-icon{display:grid;place-items:center;width:34px;height:34px;border-radius:8px;background:rgba(237,32,39,.12);color:var(--red);font-size:16px;flex-shrink:0}
-.dropdown-item-content{display:flex;flex-direction:column}
-.dropdown-item-title{font-size:14px;font-weight:700;line-height:1.2}
-.dropdown-item-desc{font-size:11px;color:var(--muted);margin-top:2px}
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: relative;
+    }
+    .btn-icon {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: all 0.2s;
+    }
+    .btn-icon:hover {
+      border-color: var(--accent-red);
+      transform: translateY(-1px);
+    }
 
-.notch{position:absolute;left:50%;transform:translateX(-50%);z-index:6;filter:drop-shadow(0 2px 0 var(--header-border))}
-.notch.down{bottom:-28px}
-.notch.up{top:-28px;filter:drop-shadow(0 -2px 0 var(--header-border))}
-.notch button{display:grid;place-items:center;width:100px;height:26px;border:0;cursor:pointer;color:var(--red);background:var(--notch-bg);clip-path:polygon(0 0,100% 0,82% 100%,18% 100%);padding-bottom:4px}
-.notch.up button{clip-path:polygon(18% 0,82% 0,100% 100%,0 100%);padding:4px 0 0}
-.notch button:hover{color:var(--text)}
-.meterbox{margin-top:12px}
-.mlabel{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted);margin-bottom:8px}
-.meter{position:relative;height:8px;border-radius:99px;background:linear-gradient(90deg,#ef4444,#f59e0b 50%,#34d399)}
-.meter i{position:absolute;top:-4px;width:4px;height:16px;border-radius:2px;background:#fff;transform:translateX(-50%);box-shadow:0 0 0 2px var(--card)}
-#f-sort{width:auto;max-width:160px;text-overflow:ellipsis}
-h1{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-weight:800;font-size:clamp(30px,4.5vw,44px);line-height:1.15;margin:36px 0 10px;letter-spacing:-.02em}
-.sub{color:var(--muted);font-size:clamp(15px,1.5vw,18px);line-height:1.5;margin:0 0 22px}
-.sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:16px}
-.sum div{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
-.sum small{display:block;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em}
-.sum b{font-size:18px}
+    /* DROPDOWN MENU */
+    .menu-dropdown {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      width: 210px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+      padding: 6px;
+      display: none;
+      flex-direction: column;
+      z-index: 200;
+      animation: fadeIn 0.15s ease-out;
+    }
+    .menu-dropdown.active { display: flex; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      color: var(--text-main);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      width: 100%;
+      text-align: left;
+      transition: background 0.15s;
+    }
+    .menu-item:hover {
+      background: var(--bg-card);
+      color: var(--accent-red);
+    }
 
-.filters-bar{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin-bottom:18px;overflow-x:auto;scrollbar-width:none}
-.filters-bar::-webkit-scrollbar{display:none}
-.profile-pill-link{display:inline-flex;align-items:center;gap:8px;background:rgba(237,32,39,.08);border:1px solid rgba(237,32,39,.28);padding:7px 12px;border-radius:8px;font-size:13px;color:var(--text);text-decoration:none;cursor:pointer;transition:all .15s ease;flex-shrink:0;white-space:nowrap}
-.profile-pill-link:hover{background:rgba(237,32,39,.16);border-color:var(--red);transform:translateY(-1px)}
-.profile-pill-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);flex-shrink:0}
-.profile-pill-tag{color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase;margin-left:2px}
-.filters-bar .divider{width:1px;height:24px;background:var(--line);margin:0 2px;flex-shrink:0}
-.filters-bar label{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);flex-shrink:0;white-space:nowrap}
-.filters-bar select{background:var(--input-bg);color:var(--text);border:1px solid var(--line);border-radius:6px;padding:7px 9px;font:inherit}
-.filters-bar .chk{flex-direction:row;align-items:center;gap:6px;text-transform:none;font-size:13px;color:var(--text);flex-shrink:0}
-.views{margin-left:auto;display:flex;gap:6px;flex-shrink:0}
-.views button{background:var(--input-bg);color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:7px 12px;font:inherit;cursor:pointer;white-space:nowrap}
-.views button.on{color:var(--text);border-color:var(--red);background:var(--card)}
+    /* CONTAINER & TOOLBAR (VIENĀ LĪNIJĀ) */
+    .main-wrap {
+      max-width: 1380px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px 20px 60px;
+      flex: 1;
+    }
 
-.profile-container{max-width:820px;margin:24px auto 60px}
-.profile-card{background:var(--profile-card-bg);border:1px solid var(--line);border-radius:14px;padding:24px 28px;margin-bottom:20px;box-shadow:0 4px 18px rgba(0,0,0,.06)}
-.profile-sec-title{font-size:18px;font-weight:800;margin:0 0 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line);padding-bottom:10px}
-.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px}
-.form-group{display:flex;flex-direction:column;gap:7px}
-.form-group label{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
-.form-group select,.form-group input{background:var(--input-bg);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:9px 12px;font:inherit}
-.form-group select:focus,.form-group input:focus{border-color:var(--red);outline:none}
-.form-helper{font-size:12px;color:var(--muted);line-height:1.4}
-.profile-actions{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-top:28px}
-.btn-save-profile{background:var(--red);color:#fff;border:none;padding:12px 24px;border-radius:8px;font-weight:700;font-size:15px;cursor:pointer;box-shadow:0 4px 12px rgba(237,32,39,.35);transition:all .15s ease}
-.btn-save-profile:hover{opacity:.92;transform:translateY(-1px)}
-.btn-reset-profile{background:var(--input-bg);color:var(--muted);border:1px solid var(--line);padding:11px 20px;border-radius:8px;font-weight:600;font-size:14px;cursor:pointer}
-.btn-reset-profile:hover{color:var(--text);border-color:var(--muted)}
-.save-toast{display:none;padding:10px 16px;border-radius:8px;background:rgba(52,211,153,.15);border:1px solid var(--green);color:var(--green);font-size:13px;font-weight:700;align-items:center;gap:8px}
+    .toolbar-bar {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 10px 16px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .toolbar-bar::-webkit-scrollbar { display: none; }
 
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:16px}
-.stores-container{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;align-items:start}
-@media (max-width:960px){.stores-container{grid-template-columns:1fr;gap:24px}}
-.store-col{display:flex;flex-direction:column;gap:16px}
-.store-cards{display:flex;flex-direction:column;gap:16px}
-.store-header{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px 14px 10px;text-decoration:none;position:relative;border-radius:12px;transition:all .2s ease;border-bottom:2px solid transparent}
-.store-header:hover{background:var(--store-hover-bg);border-bottom-color:var(--red)}
-.store-logo-box{width:100%;height:58px;display:flex;align-items:center;justify-content:center;position:relative}
-.store-logo-box img{max-width:85%;max-height:52px;object-fit:contain;filter:drop-shadow(0 4px 10px rgba(0,0,0,.3));transition:transform .2s ease,filter .2s ease}
-.store-header:hover .store-logo-box img{transform:scale(1.06);filter:drop-shadow(0 6px 14px rgba(237,32,39,.35))}
-.store-fallback-logo{display:flex;align-items:center;justify-content:center;gap:8px;text-align:left}
-.store-icon-pill{width:32px;height:32px;border-radius:6px;background:rgba(237,32,39,.15);border:1px solid rgba(237,32,39,.35);color:var(--red);display:grid;place-items:center}
-.store-title{font-weight:800;font-size:15px;color:var(--text);letter-spacing:.02em}
-.store-ext-hint{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.04em;text-transform:uppercase;margin-top:6px;opacity:.65;transition:opacity .2s,color .2s}
-.store-header:hover .store-ext-hint{opacity:1;color:var(--link)}
-.card{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 4px 16px rgba(0,0,0,.08);transition:all .2s ease}
-.card-zero{background:var(--card-zero);border-color:var(--line);border-style:dashed}
-.price.is-zero{color:var(--muted)}
-.btn-zero{color:var(--muted);background:var(--btn-zero-bg)}
-.btn-zero:hover{background:var(--btn-hover);color:var(--text)}
-.imgbox{position:relative;height:180px;display:grid;place-items:center;background:var(--img-grad)}
-.imgbox::after{content:"";position:absolute;bottom:20px;left:20%;width:60%;height:16px;background:radial-gradient(ellipse,rgba(0,0,0,.45),transparent 70%);filter:blur(4px)}
-.imgbox img{position:relative;z-index:1;max-height:150px;max-width:85%;object-fit:contain;filter:drop-shadow(0 8px 8px rgba(0,0,0,.35))}
-.noimg{display:none;color:var(--muted);font-size:13px;text-align:center;padding:0 16px;position:relative;z-index:1}
-.missing img{display:none}.missing .noimg{display:flex;flex-direction:column;align-items:center;gap:8px}
-.missing .noimg svg{opacity:.4}
-.body{padding:14px 16px;flex:1}
-.body h3{margin:0;font-size:17px}
-.shop{color:var(--muted);margin:0 0 10px}
-.badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;letter-spacing:.04em}
-.b-demo{background:#3a2d06;color:var(--amber);border:1px solid #6b5210}
-.b-ok{background:#06301f;color:var(--green);border:1px solid #0f6b46}
-.b-no{background:#262a35;color:var(--muted);border:1px solid var(--line)}
-.b-spec{background:rgba(237,32,39,.12);color:var(--red);border:1px solid rgba(237,32,39,.3)}
-[data-theme="light"] .b-demo{background:#fef3c7;color:#b45309;border:1px solid #fcd34d}
-[data-theme="light"] .b-ok{background:#d1fae5;color:#047857;border:1px solid #6ee7b7}
-[data-theme="light"] .b-no{background:#f1f5f9;color:#64748b;border:1px solid #cbd5e1}
-[data-theme="light"] .b-spec{background:rgba(237,32,39,.08);color:var(--red);border:1px solid rgba(237,32,39,.25)}
-.row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:6px 0;border-top:1px solid var(--line)}
-.row span:first-child{color:var(--muted)}
-.row span:last-child{text-align:right;font-weight:600}
-.price{font-size:22px;font-weight:800}
-.old{color:var(--muted);text-decoration:line-through;font-weight:400;font-size:14px;margin-left:6px}
-.note{color:var(--muted);font-size:13px;margin:10px 0 0}
-.btn{display:block;text-align:center;padding:10px;background:var(--btn-bg);border-top:1px solid var(--line);color:var(--link);text-decoration:none;font-weight:600}
-.btn:hover{background:var(--btn-hover)}
-.tw{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
-table{border-collapse:collapse;width:100%;background:var(--card);min-width:640px}
-th,td{padding:10px 14px;text-align:left;border-bottom:1px solid var(--line)}
-th{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.05em}
-.empty{background:var(--card);border:1px dashed var(--line);border-radius:12px;padding:28px;text-align:center;color:var(--muted)}
-.src{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
-.src .card{padding:14px 16px;gap:8px}
+    .toolbar-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-shrink: 0;
+    }
+    .toolbar-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
 
-footer.bar{position:relative;margin-top:70px;background:var(--footer-bg);border-top:2px solid var(--header-border);box-shadow:0 -8px 24px var(--shadow-header);color:var(--muted);font-size:13px;padding:40px 0 32px}
-.footer-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:36px;align-items:start;margin-bottom:28px}
-@media (max-width:768px){.footer-grid{grid-template-columns:1fr;gap:24px}}
-.footer-brand-title{display:flex;align-items:center;gap:8px;margin-bottom:12px}
-.footer-logo{height:38px;width:auto;max-width:190px;object-fit:contain;display:block}
-[data-theme="light"] .footer-logo{filter:drop-shadow(0 1px 3px rgba(0,0,0,.25))}
-.footer-desc{margin:0;line-height:1.6;font-size:13px;color:var(--muted)}
-.footer-links{display:flex;flex-direction:column;gap:8px}
-.footer-links-title{font-size:12px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.05em}
-.footer-links a{color:var(--muted);text-decoration:none;transition:color .15s}
-.footer-links a:hover{color:var(--red)}
-.footer-bottom{border-top:1px solid var(--line);padding-top:20px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:14px;font-size:12px}
-.footer-copy{color:var(--muted)}
-.footer-disclaimer{color:var(--muted);opacity:.8;max-width:650px;line-height:1.5}
-</style>
+    .profile-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(225, 29, 72, 0.08);
+      border: 1px solid var(--border-accent);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .profile-pill:hover {
+      background: rgba(225, 29, 72, 0.16);
+      border-color: var(--accent-red);
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-green);
+      box-shadow: 0 0 8px var(--accent-green);
+    }
+    .pill-action {
+      color: var(--accent-red);
+      font-weight: 700;
+      margin-left: 4px;
+    }
+
+    .toolbar-divider {
+      width: 1px;
+      height: 24px;
+      background: var(--border-color);
+    }
+
+    .filter-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+    .filter-select {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      outline: none;
+      cursor: pointer;
+      max-width: 160px;
+    }
+    .filter-checkbox {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      user-select: none;
+      font-size: 0.82rem;
+      color: var(--text-main);
+    }
+    .filter-checkbox input { accent-color: var(--accent-red); cursor: pointer; }
+
+    .view-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .view-btn.active {
+      border-color: var(--accent-red);
+      background: rgba(225, 29, 72, 0.12);
+      color: var(--accent-red);
+    }
+
+    /* SYNC STATS */
+    .sync-stats {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    .sync-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(34, 197, 94, 0.1);
+      color: var(--accent-green);
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+    }
+
+    /* CARDS GRID */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    @media (max-width: 1080px) {
+      .cards-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 720px) {
+      .cards-grid { grid-template-columns: 1fr; }
+    }
+
+    .skate-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-card);
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .skate-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    .card-img-wrap {
+      background: var(--bg-card);
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-bottom: 1px solid var(--border-color);
+      height: 220px;
+    }
+    .card-img-wrap img {
+      max-height: 170px;
+      max-width: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3));
+    }
+
+    .card-body {
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    .card-header-meta {
+      margin-bottom: 14px;
+    }
+    .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 4px;
+    }
+    .card-retailer-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    .retailer-pill {
+      font-weight: 600;
+      color: var(--text-main);
+    }
+    .status-tag {
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      font-family: var(--font-mono);
+    }
+    .tag-verified { background: rgba(34, 197, 94, 0.15); color: var(--accent-green); }
+    .tag-unverified { background: rgba(148, 163, 184, 0.15); color: var(--text-muted); }
+
+    .specs-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 14px;
+      font-size: 0.85rem;
+    }
+    .specs-table tr {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    .specs-table td {
+      padding: 6px 0;
+    }
+    .specs-table td:first-child {
+      color: var(--text-muted);
+    }
+    .specs-table td:last-child {
+      text-align: right;
+      font-weight: 600;
+    }
+
+    .price-val {
+      font-size: 1.25rem;
+      font-family: var(--font-mono);
+      font-weight: 700;
+    }
+    .price-old {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-decoration: line-through;
+      margin-left: 6px;
+    }
+    .stock-in { color: var(--accent-green); }
+    .stock-out { color: var(--accent-amber); }
+
+    /* POSITION / COMPATIBILITY METER (BEZ DEMO) */
+    .compat-box {
+      margin-top: auto;
+      background: var(--bg-card);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 14px;
+    }
+    .compat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.78rem;
+      margin-bottom: 6px;
+    }
+    .compat-tag {
+      background: rgba(225, 29, 72, 0.2);
+      color: #fb7185;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+    .compat-score {
+      font-family: var(--font-mono);
+      font-weight: 700;
+    }
+    .compat-bar {
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-bottom: 6px;
+    }
+    .compat-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-amber), var(--accent-green));
+      border-radius: 3px;
+    }
+    .compat-desc {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      line-height: 1.3;
+    }
+
+    .btn-shop {
+      display: block;
+      width: 100%;
+      text-align: center;
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 9px 0;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .btn-shop:hover {
+      background: var(--accent-red);
+      border-color: var(--accent-red);
+      color: #fff;
+    }
+
+    /* COMPARISON TABLE */
+    .cmp-wrapper {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      overflow-x: auto;
+      box-shadow: var(--shadow-card);
+    }
+    .cmp-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.88rem;
+    }
+    .cmp-table th, .cmp-table td {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .cmp-table th {
+      background: var(--bg-card);
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .cmp-model-name {
+      font-weight: 700;
+      color: var(--text-main);
+    }
+    .cmp-price-box {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .cmp-price-num {
+      font-size: 1.15rem;
+      font-family: var(--font-mono);
+      font-weight: 700;
+    }
+    .cmp-stock-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+    }
+    .cmp-link {
+      font-size: 0.75rem;
+      color: var(--accent-red);
+      text-decoration: none;
+      font-weight: 600;
+      margin-top: 4px;
+      display: inline-block;
+    }
+    .cmp-link:hover { text-decoration: underline; }
+
+    /* LABĀKĀ CENA IZCELŠANA */
+    .best-price-cell {
+      background: rgba(34, 197, 94, 0.08) !important;
+      outline: 2px solid var(--accent-green);
+      outline-offset: -2px;
+      border-radius: 6px;
+    }
+    .best-price-cell .cmp-price-num {
+      color: var(--accent-green);
+    }
+    .best-price-badge {
+      display: inline-block;
+      background: var(--accent-green);
+      color: #0b1120;
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-top: 2px;
+      text-transform: uppercase;
+      width: fit-content;
+    }
+
+    /* MODAL: MANS PROFILS */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      width: 100%;
+      max-width: 520px;
+      border-radius: 14px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      overflow: hidden;
+      animation: modalScale 0.2s ease-out;
+    }
+    @keyframes modalScale {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .modal-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .modal-header h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+    .modal-close {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.4rem;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .modal-body {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-group label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+    .form-group select, .form-group input {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      outline: none;
+    }
+    .form-group select:focus, .form-group input:focus {
+      border-color: var(--accent-red);
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      background: var(--bg-card);
+    }
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+    .btn-primary {
+      background: var(--accent-red);
+      border: none;
+      color: #fff;
+      padding: 8px 20px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* FOOTER */
+    footer {
+      background-color: var(--bg-surface);
+      border-top: 1px solid var(--border-color);
+      padding: 32px 20px;
+      margin-top: auto;
+    }
+    .footer-inner {
+      max-width: 1380px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .footer-logo {
+      height: 38px;
+      width: auto;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+    }
+    .footer-info {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+    .footer-disclaimer {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      opacity: 0.8;
+      max-width: 500px;
+      text-align: right;
+    }
+    @media (max-width: 768px) {
+      .footer-inner { flex-direction: column; align-items: flex-start; }
+      .footer-disclaimer { text-align: left; }
+    }
+  </style>
 </head>
 <body>
-<header>
-  <div class="wrap">
-    <a class="brand" href="#" title="HOCKEY SKATE RADAR">
-      <div class="brand-logo-wrap">
-        <img class="brand-logo" src="img/logo.svg" alt="HOCKEY SKATE RADAR"
-             onload="const bt=document.getElementById('brand-title'); if(bt) bt.style.display='none';"
-             onerror="this.style.display='none'; const fb=document.getElementById('logo-fallback'); if(fb) fb.style.display='inline-flex';">
-        <div id="logo-fallback" class="brand-logo-err">
-          <span>⚠️</span> <span>Mape 'img/logo.svg' nav atrasta</span>
-        </div>
-      </div>
-      <span class="brand-text" id="brand-title">
-        <span class="brand-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>
-          </svg>
-        </span>
-        <span>HOCKEY SKATE RADAR</span>
-      </span>
-    </a>
-    <nav id="nav"></nav>
-    <div class="header-actions">
-      <div class="theme-box">
-        <button id="theme-toggle" class="theme-switch" type="button" aria-label="Pārslēgt tumšo vai gaišo režīmu" title="Pārslēgt tumšo / gaišo režīmu">
-          <span class="ts-icon ts-sun" aria-hidden="true">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
-            </svg>
-          </span>
-          <span class="ts-icon ts-moon" aria-hidden="true">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-            </svg>
-          </span>
-          <span class="ts-thumb"></span>
-        </button>
-      </div>
 
-      <div class="menu-box">
-        <button id="menu-btn" class="menu-btn" type="button" aria-label="Atvērt izvēlni" title="Izvēlne" aria-expanded="false" aria-haspopup="true">
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
-        <div id="menu-dropdown" class="dropdown-menu" role="menu">
-          <div class="dropdown-head">Iestatījumi</div>
-          <a href="#" class="dropdown-item" data-open="profile" role="menuitem">
-            <span class="dropdown-item-icon">👤</span>
-            <div class="dropdown-item-content">
-              <span class="dropdown-item-title">Mans profils</span>
-              <span class="dropdown-item-desc">Izmēri, FIT un budžets</span>
-            </div>
-          </a>
+  <!-- HEADER -->
+  <header>
+    <div class="header-inner">
+      <a href="#" class="brand">
+        <img src="img/logo.svg" alt="HSR Logo" class="brand-logo-img" onerror="this.onerror=null; this.src='img/logo.png'; this.style.display='block';">
+        <div class="brand-text">
+          <h1>Hockey Skate <span>Radar</span></h1>
+          <p>Latvijas e-veikalu cenu un pieejamības agregators</p>
+        </div>
+      </a>
+
+      <div class="header-actions">
+        <!-- Tēmas slēdzis -->
+        <button id="theme-toggle" class="btn-icon" title="Pārslēgt dienas/nakts režīmu">🌙</button>
+
+        <!-- Hamburger poga -->
+        <button id="menu-btn" class="btn-icon" title="Izvēlne">☰</button>
+
+        <!-- Mazā izkrītošā izvēlne -->
+        <div id="menu-dropdown" class="menu-dropdown">
+          <button class="menu-item" id="open-profile-btn">
+            <span>👤</span> Mans profils
+          </button>
         </div>
       </div>
     </div>
-  </div>
-  <div class="notch down"><button data-go="bottom" aria-label="Uz lapas apakšu"><svg width="22" height="12" viewBox="0 0 22 12"><path d="M2 2l9 8 9-8" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg></button></div>
-</header>
+  </header>
 
-<main class="wrap" id="app"></main>
-
-<footer class="bar">
-  <div class="notch up"><button data-go="top" aria-label="Uz lapas augšu"><svg width="22" height="12" viewBox="0 0 22 12"><path d="M2 10l9-8 9 8" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg></button></div>
-  <div class="wrap">
-    <div class="footer-grid">
-      <div>
-        <div class="footer-brand-title">
-          <img src="img/logo.svg" alt="HOCKEY SKATE RADAR" class="footer-logo"
-               onerror="if(!this.dataset.triedPng){this.dataset.triedPng='1';this.src='img/logo.png';}else{this.style.display='none';this.nextElementSibling.style.display='inline-flex';}">
-          <span style="display:none;font-weight:800;font-size:14px;color:var(--text);align-items:center;gap:6px">
-            <span>🏒</span> HOCKEY SKATE RADAR
-          </span>
-        </div>
-        <p class="footer-desc">
-          Neatkarīgs hokeja ekipējuma cenu un pieejamības agregators. Mēs uzraugām vadošo Latvijas un Eiropas tirdzniecības vietu piedāvājumu, lai palīdzētu spēlētājiem atrast piemērotāko inventāru par labāko cenu.
-        </p>
-      </div>
-      <div class="footer-links">
-        <span class="footer-links-title">Ātrās saites</span>
-        <a href="#" data-open="profile">Spēlētāja profils un iestatījumi</a>
-        <a href="https://www.hokejam.lv/" target="_blank" rel="noopener">Hokejam.lv</a>
-        <a href="https://hokejapasaule.lv/" target="_blank" rel="noopener">Hokeja Pasaule</a>
-        <a href="https://www.sportega.lv/" target="_blank" rel="noopener">Sportega</a>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <div class="footer-copy">© 2026 HOCKEY SKATE RADAR. Visas tiesības aizsargātas.</div>
-      <div class="footer-disclaimer">
-        Cenas, noliktavas atlikumi un piegādes izmaksas tiek iegūtas no publiskajiem veikalu datiem un var tikt mainītas bez iepriekšēja brīdinājuma. Pirms pirkuma veikšanas lūdzam precizēt informāciju konkrētā pārdevēja vietnē.
-      </div>
-    </div>
-  </div>
-</footer>
-
-<script>
-// --- MODEĻU SPECIFIKĀCIJA UN DINAMISKAIS ATBILSTĪBAS INDEKSS ---
-const MODELS = [
-  {
-    id: 'bauer-vapor-fly40',
-    brand: 'Bauer',
-    name: 'Vapor S25 FLY40 Senior',
-    series: 'Vapor Agility',
-    match: { forward: 92, defense: 64 },
-    profileBadge: 'Agility / Ātrums',
-    note: 'Vapor ģeometrija ar PowerFly holderi un Curv kompozītu. Izteikts uzsvars uz eksplozīvu startu un straujiem virziena maiņas manevriem.'
-  },
-  {
-    id: 'bauer-supreme-f40',
-    brand: 'Bauer',
-    name: 'Supreme S26 F40 Senior',
-    series: 'Supreme Power',
-    match: { forward: 72, defense: 90 },
-    profileBadge: 'Power / Stabilitāte',
-    note: 'Supreme sērijas jaunākā paaudze (S26). Anatomisks atbalsts potītei, maksimāla enerģijas pārnese un stabilitāte divcīņās.'
-  },
-  {
-    id: 'bauer-supreme-m40',
-    brand: 'Bauer',
-    name: 'Supreme S24 M40 Senior',
-    series: 'Supreme Power (S24)',
-    match: { forward: 68, defense: 86 },
-    profileBadge: 'Power / Izturība',
-    note: 'Supreme sērija (S24 paaudze). Lieliska jaudas atdeve par izdevīgāku budžeta cenu.'
-  }
-];
-
-const RETAILERS = {
-  hj: { id: 'hj', name: 'Hokejam.lv',     file: 'hokejam-lv',     url: 'https://www.hokejam.lv/' },
-  hp: { id: 'hp', name: 'Hokeja Pasaule', file: 'hokeja-pasaule', url: 'https://hokejapasaule.lv/' },
-  sp: { id: 'sp', name: 'Sportega',       file: 'sportega',       url: 'https://www.sportega.lv/' }
-};
-
-let OFFERS = [
-  { model: 'bauer-vapor-fly40',  retailer: 'hp', section: 'new', price: 535, oldPrice: null, shipping: 3.5,  sizes: ['7','7.5'], fits: ['FIT 2'],         stock: true,  checked: '2026-10-28', url: 'https://hokejapasaule.lv/lv_lv/bauer-vapor-s25-fly40-senior-hokeja-slidas', status: 'VERIFIED' },
-  { model: 'bauer-vapor-fly40',  retailer: 'hj', section: 'new', price: null, oldPrice: null, shipping: 0,    sizes: ['7.5','8'], fits: ['FIT 2'],         stock: false, checked: null,         url: 'https://www.hokejam.lv/lv/search?s=Vapor+FLY40', status: 'DEMO' },
-  { model: 'bauer-vapor-fly40',  retailer: 'sp', section: 'new', price: 535, oldPrice: null, shipping: 4,    sizes: ['7','7.5'], fits: ['FIT 2'],         stock: true,  checked: '2026-10-28', url: 'https://www.sportega.lv/hokeja-slidas-bauer-vapor-fly40-senior/d1502757', status: 'VERIFIED' },
-  { model: 'bauer-supreme-f40',  retailer: 'hp', section: 'new', price: 535, oldPrice: null, shipping: 3.5,  sizes: ['7','7.5'], fits: ['FIT 2'],         stock: true,  checked: '2026-10-28', url: 'https://hokejapasaule.lv/lv_lv/bauer-supreme-s26-f40-senior-hokeja-slidas', status: 'VERIFIED' },
-  { model: 'bauer-supreme-f40',  retailer: 'hj', section: 'new', price: 475.99, oldPrice: 559.99, shipping: 0, sizes: ['7.5'],  fits: ['FIT 2'],         stock: true,  checked: '2026-10-28', url: 'https://www.hokejam.lv/lv/pieauguso-hokeja-slidas/5455-bauer-supreme-f40-s26-pieauguso-hokeja-slidas', status: 'VERIFIED' },
-  { model: 'bauer-supreme-f40',  retailer: 'sp', section: 'new', price: null, oldPrice: null, shipping: 4,    sizes: ['7','7.5'], fits: ['FIT 3'],         stock: false, checked: null,         url: 'https://www.sportega.lv/hladat?q=Supreme+F40', status: 'DEMO' },
-  { model: 'bauer-supreme-m40',  retailer: 'hp', section: 'new', price: 349, oldPrice: 463,  shipping: 3.5,  sizes: ['7','7.5'], fits: ['FIT 2'],         stock: true,  checked: '2026-10-28', url: 'https://hokejapasaule.lv/lv_lv/bauer-supreme-s24-m40-senior-hokeja-slidas', status: 'VERIFIED' },
-  { model: 'bauer-supreme-m40',  retailer: 'hj', section: 'new', price: 416.49, oldPrice: 489.99, shipping: 0, sizes: ['7','7.5'], fits: ['FIT 2'],      stock: true,  checked: '2026-10-28', url: 'https://www.hokejam.lv/lv/pieauguso-hokeja-slidas/4507-bauer-supreme-m40-pieauguso-hokeja-slidas', status: 'VERIFIED' },
-  { model: 'bauer-supreme-m40',  retailer: 'sp', section: 'new', price: null, oldPrice: null, shipping: null, sizes: ['8'],      fits: ['FIT 2'],         stock: false, checked: null,         url: 'https://www.sportega.lv/hladat?q=Supreme+M40', status: 'DEMO' }
-];
-
-let DATA_SYNC_SOURCE = 'LOKĀLIE DATI';
-
-const USED_SOURCES = [
-  { name: 'SS.lv',                url: 'https://www.ss.lv/lv/sports/skating/hockey-skates/' },
-  { name: 'Facebook Marketplace', url: 'https://www.facebook.com/marketplace/' },
-  { name: 'Vintage.lv',           url: 'https://vintage.lv/' },
-  { name: 'Andelemandele.lv',     url: 'https://www.andelemandele.lv/' }
-];
-
-const DEFAULT_PROFILE = {
-  role: 'forward',
-  size: 'pref',
-  fit: 'FIT 2',
-  min: 300,
-  max: 600,
-  prefModel: 'all',
-  level: 'amateur'
-};
-
-function loadProfile() {
-  try {
-    const raw = localStorage.getItem('hsr_user_profile');
-    if (raw) return { ...DEFAULT_PROFILE, ...JSON.parse(raw) };
-  } catch(e) {}
-  return { ...DEFAULT_PROFILE };
-}
-
-let PROFILE = loadProfile();
-
-const S = {
-  tab: 'new',
-  view: 'cards',
-  stock: true,
-  sort: 'default'
-};
-
-const TABS = { new:'Jaunas slidas LV', used:'Lietotas slidas', intl:'Ārzemju deals', profile:'Mans profils' };
-const model = id => MODELS.find(m => m.id === id);
-const eur = n => n == null ? '—' : '€' + n.toFixed(2);
-const total = o => (o && o.price != null) ? o.price + (o.shipping || 0) : null;
-const badge = s => s === 'VERIFIED' ? '<span class="badge b-ok">Pārbaudīts</span>'
-  : s === 'DEMO' ? '<span class="badge b-demo">Nav atrasts veikalā</span>'
-  : '<span class="badge b-no">Nav pārbaudīts</span>';
-const row = (l, v) => `<div class="row"><span>${l}</span><span>${v}</span></div>`;
-
-const ROLES = { forward: 'uzbrucējam', defense: 'aizsargam' };
-const SIZE_LABELS = {
-  'pref': '7 un 7.5',
-  '7': '7 Senior',
-  '7.5': '7.5 Senior',
-  '8': '8 Senior',
-  '8.5': '8.5 Senior',
-  'all': 'Visi izmēri'
-};
-
-function meter(m) {
-  const v = m.match && m.match[PROFILE.role];
-  if (v == null) return '';
-  return `<div class="meterbox">
-    <div class="mlabel">
-      <span>Atbilstība ${ROLES[PROFILE.role]} <span class="badge b-spec">${m.profileBadge}</span></span>
-      <b>${v}%</b>
-    </div>
-    <div class="meter"><i style="left:${v}%"></i></div>
-  </div>`;
-}
-
-function storeHeader(rKey) {
-  const r = RETAILERS[rKey];
-  return `<a class="store-header" href="${r.url}" target="_blank" rel="noopener" title="Apmeklēt ${r.name}">
-    <div class="store-logo-box">
-      <img src="img/${r.file}.png" alt="${r.name}" onerror="if(!this.dataset.triedSvg){this.dataset.triedSvg='1';this.src='img/${r.file}.svg';}else{this.style.display='none';this.nextElementSibling.style.display='flex';}">
-      <div class="store-fallback-logo" style="display:none">
-        <div class="store-icon-pill">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-        </div>
-        <span class="store-title">${r.name}</span>
-      </div>
-    </div>
-    <span class="store-ext-hint">${r.name} ↗</span>
-  </a>`;
-}
-
-function storeCard(m, rKey) {
-  const r = RETAILERS[rKey];
-  const o = OFFERS.find(x => x.model === m.id && x.retailer === rKey);
-
-  const t = total(o);
-  const matchSize = !o ? false : (PROFILE.size === 'pref' ? (o.sizes || []).some(s => s === '7' || s === '7.5') : (PROFILE.size === 'all' || (o.sizes || []).includes(PROFILE.size)));
-  const matchFit = !o ? false : (PROFILE.fit === 'all' || (o.fits || []).includes(PROFILE.fit));
-  const matchPrice = (t != null) && (t >= PROFILE.min && t <= PROFILE.max);
-  const matchStock = !o ? false : (S.stock ? o.stock : true);
-  const matchModel = PROFILE.prefModel === 'all' || PROFILE.prefModel === m.id;
-
-  const isAvailable = o && o.stock && o.price != null && matchSize && matchFit && matchPrice && matchStock && matchModel;
-
-  if (isAvailable) {
-    const est = o.shipping == null ? ' <small>(piegāde nav zināma)</small>' : '';
-    return `<article class="card">
-      <div class="imgbox">
-        <img src="img/${m.id}.png" alt="${m.brand} ${m.name}" onerror="this.parentNode.classList.add('missing')">
-        <div class="noimg">
-          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 18h16M7 18V6c0-.6.4-1 1-1h6a1 1 0 0 1 1 1v12M9 10h4M9 14h4"/></svg>
-          <code>img/${m.id}.png</code>
-        </div>
-      </div>
-      <div class="body">
-        <h3>${m.brand} ${m.name}</h3>
-        <p class="shop">${r.name} &nbsp; ${badge(o.status)}</p>
-        ${row('Cena', `<span class="price">${eur(o.price)}</span>${o.oldPrice ? `<span class="old">${eur(o.oldPrice)}</span>` : ''}`)}
-        ${row('Piegāde', o.shipping == null ? 'Nav zināma' : eur(o.shipping))}
-        ${row('Kopā', eur(total(o)) + est)}
-        ${row('Izmēri', (o.sizes || []).join(', ') || 'Standarta')}
-        ${row('Bauer FIT', (o.fits || []).join(', ') || 'Standarta')}
-        ${row('Pieejamība', '<span style="color:var(--green);font-weight:700">Noliktavā</span>')}
-        ${row('Pēdējā pārbaude', o.checked || 'Pārbaudīts')}
-        ${meter(m)}
-        <p class="note">${m.note}</p>
-      </div>
-      <a class="btn" href="${o.url}" target="_blank" rel="noopener">Atvērt veikalu →</a>
-    </article>`;
-  } else {
-    const reason = !o ? 'Nav piedāvājuma' : !o.stock ? 'Izpārdots' : o.price == null ? 'Cena nav pieejama' : !matchModel ? 'Neatbilst vēlamajam modelim' : 'Neatbilst profila filtram';
-    const targetUrl = (o && o.url) || r.url;
-    return `<article class="card card-zero">
-      <div class="imgbox">
-        <img src="img/${m.id}.png" alt="${m.brand} ${m.name}" onerror="this.parentNode.classList.add('missing')">
-        <div class="noimg">
-          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 18h16M7 18V6c0-.6.4-1 1-1h6a1 1 0 0 1 1 1v12M9 10h4M9 14h4"/></svg>
-          <code>img/${m.id}.png</code>
-        </div>
-      </div>
-      <div class="body">
-        <h3>${m.brand} ${m.name}</h3>
-        <p class="shop">${r.name} &nbsp; <span class="badge b-no">${reason}</span></p>
-        ${row('Cena', `<span class="price is-zero">0.00 €</span>`)}
-        ${row('Piegāde', '—')}
-        ${row('Kopā', '0.00 €')}
-        ${row('Izmēri', 'Nav pieejams')}
-        ${row('Bauer FIT', '—')}
-        ${row('Pieejamība', '<span style="color:var(--amber)">Nav noliktavā (0 €)</span>')}
-        ${row('Pēdējā pārbaude', (o && o.checked) || 'Gaida pārbaudi')}
-        ${meter(m)}
-        <p class="note">${m.note}</p>
-      </div>
-      <a class="btn btn-zero" href="${targetUrl}" target="_blank" rel="noopener">Pārbaudīt ${r.name} lapā →</a>
-    </article>`;
-  }
-}
-
-function table(list) {
-  const rs = Object.keys(RETAILERS);
-  const head = rs.map(k => `<th>${RETAILERS[k].name}</th>`).join('');
-  const body = MODELS.map(m => {
-    const cells = rs.map(k => {
-      const o = list.find(x => x.model === m.id && x.retailer === k);
-      return `<td>${o && o.price != null ? `<b>${eur(total(o))}</b><br><small>${(o.sizes||[]).join(', ')} · ${(o.fits||[]).join(', ')}</small>` : '<span class="badge b-no">Nav datu / filtrs</span>'}</td>`;
-    }).join('');
-    return `<tr><td><b>${m.brand} ${m.name}</b></td>${cells}</tr>`;
-  }).join('');
-  return `<div class="tw"><table><tr><th>Modelis</th>${head}</tr>${body}</table></div>`;
-}
-
-function filtersBar() {
-  const sel = (id, opts, v) => `<select id="${id}">${opts.map(([k, t]) => `<option value="${k}"${k === v ? ' selected' : ''}>${t}</option>`).join('')}</select>`;
-  return `<div class="filters-bar">
-    <button type="button" class="profile-pill-link" data-open="profile" title="Pielāgot savu spēlētāja profilu">
-      <span class="profile-pill-dot"></span>
-      <span><b>Profils:</b> ${SIZE_LABELS[PROFILE.size] || PROFILE.size} · ${PROFILE.fit} · €${PROFILE.min}–${PROFILE.max}</span>
-      <span class="profile-pill-tag">MAINĪT ⚙️</span>
-    </button>
-    <div class="divider"></div>
-    <label>Kārtot:${sel('f-sort', [['default', 'Pēc noklusējuma'], ...MODELS.map(m => [m.id, m.name])], S.sort)}</label>
-    <label class="chk"><input type="checkbox" id="f-stock"${S.stock ? ' checked' : ''}> Tikai noliktavā</label>
-    <div class="views">
-      <button data-v="cards" class="${S.view === 'cards' ? 'on' : ''}">Kartes</button>
-      <button data-v="table" class="${S.view === 'table' ? 'on' : ''}">Salīdzinājums</button>
-    </div>
-  </div>`;
-}
-
-function viewNew() {
-  const verified = OFFERS.filter(o => o.status === 'VERIFIED').length;
-  const inStockOffers = OFFERS.filter(o => o.stock && o.price != null);
-  const best = inStockOffers.filter(o => o.status === 'VERIFIED').sort((a, b) => total(a) - total(b))[0];
-  const low = inStockOffers.length ? inStockOffers.reduce((a, b) => total(b) < total(a) ? b : a) : null;
-
-  const rKeys = Object.keys(RETAILERS);
-  const sortedModels = [...MODELS].sort((a, b) => {
-    if (S.sort === a.id) return -1;
-    if (S.sort === b.id) return 1;
-    return 0;
-  });
-
-  const columnsHtml = rKeys.map(k => `
-    <div class="store-col">
-      ${storeHeader(k)}
-      <div class="store-cards">
-        ${sortedModels.map(m => storeCard(m, k)).join('')}
-      </div>
-    </div>
-  `).join('');
-
-  return `<h1>Jaunas slidas Latvijā</h1>
-  <p class="sub">Hokeja Pasaule, Hokejam.lv, Sportega. Profila iestatījumi: <b>${ROLES[PROFILE.role]}</b>, izmēri <b>${SIZE_LABELS[PROFILE.size] || PROFILE.size}</b>, prioritāte <b>${PROFILE.fit}</b>.</p>
-  <div class="sum">
-    <div><small>Labākais pārbaudītais</small><b>${best ? eur(total(best)) : 'Nav pārbaudītu datu'}</b></div>
-    <div><small>Zemākā cena (profilam)</small><b>${low ? eur(total(low)) : '—'}</b></div>
-    <div><small>Pārbaudīti piedāvājumi</small><b>${verified} no ${OFFERS.length}</b></div>
-    <div><small>Datu avots</small><b><span class="badge b-ok">${DATA_SYNC_SOURCE}</span></b></div>
-  </div>
-  ${filtersBar()}
-  ${S.view === 'cards' ? `<div class="stores-container">${columnsHtml}</div>` : table(OFFERS)}`;
-}
-
-function viewProfile() {
-  return `<div class="profile-container">
-    <h1>Mans Spēlētāja Profils</h1>
-    <p class="sub">Pielāgo savus izmērus, anatomiskās īpatnības un budžetu. Radars automātiski filtrēs un sarindos slidas tieši pēc šiem parametriem.</p>
-    
-    <div class="profile-card">
-      <div class="profile-sec-title">
-        <span>📏</span> <span>1. Slidu izmērs un piegriezums (FIT)</span>
-      </div>
-      <div class="form-grid">
-        <div class="form-group">
-          <label for="p-size">Vēlamais izmērs</label>
-          <select id="p-size">
-            <option value="pref"${PROFILE.size === 'pref' ? ' selected' : ''}>7 un 7.5 Senior (Ieteicamais)</option>
-            <option value="7"${PROFILE.size === '7' ? ' selected' : ''}>7 Senior (EUR 42)</option>
-            <option value="7.5"${PROFILE.size === '7.5' ? ' selected' : ''}>7.5 Senior (EUR 42.5)</option>
-            <option value="8"${PROFILE.size === '8' ? ' selected' : ''}>8 Senior (EUR 43)</option>
-            <option value="8.5"${PROFILE.size === '8.5' ? ' selected' : ''}>8.5 Senior (EUR 44)</option>
-            <option value="all"${PROFILE.size === 'all' ? ' selected' : ''}>Visi izmēri</option>
-          </select>
-          <span class="form-helper">Ja neesi pārliecināts par pusizmēru, atstāj '7 un 7.5'.</span>
-        </div>
-
-        <div class="form-group">
-          <label for="p-fit">Bauer FIT sistēma</label>
-          <select id="p-fit">
-            <option value="FIT 2"${PROFILE.fit === 'FIT 2' ? ' selected' : ''}>FIT 2 — Standarta platums & pacēlums (Ieteicams)</option>
-            <option value="FIT 1"${PROFILE.fit === 'FIT 1' ? ' selected' : ''}>FIT 1 — Šaura pēda / zems pacēlums (Vapor stils)</option>
-            <option value="FIT 3"${PROFILE.fit === 'FIT 3' ? ' selected' : ''}>FIT 3 — Plata pēda / augsts pacēlums (Nexus/Supreme)</option>
-            <option value="all"${PROFILE.fit === 'all' ? ' selected' : ''}>Visi platumi</option>
-          </select>
-          <span class="form-helper">FIT 2 der aptuveni 70% amatieru un pusprofesionāļu spēlētāju.</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="profile-card">
-      <div class="profile-sec-title">
-        <span>🏒</span> <span>2. Spēlētāja loma & vēlamie modeļi</span>
-      </div>
-      <div class="form-grid">
-        <div class="form-group">
-          <label for="p-role">Pozīcija laukumā</label>
-          <select id="p-role">
-            <option value="forward"${PROFILE.role === 'forward' ? ' selected' : ''}>Uzbrucējs (akcents uz manevrētspēju un ātrumu)</option>
-            <option value="defense"${PROFILE.role === 'defense' ? ' selected' : ''}>Aizsargs (akcents uz stabilitāti un jaudu)</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="p-prefModel">Vēlamā sērija / modelis</label>
-          <select id="p-prefModel">
-            <option value="all"${PROFILE.prefModel === 'all' ? ' selected' : ''}>Visi Bauer modeļi (Vapor & Supreme)</option>
-            <option value="bauer-vapor-fly40"${PROFILE.prefModel === 'bauer-vapor-fly40' ? ' selected' : ''}>Tikai Vapor FLY40 (Vieglums & sprints)</option>
-            <option value="bauer-supreme-f40"${PROFILE.prefModel === 'bauer-supreme-f40' ? ' selected' : ''}>Tikai Supreme F40 (S26 paaudze)</option>
-            <option value="bauer-supreme-m40"${PROFILE.prefModel === 'bauer-supreme-m40' ? ' selected' : ''}>Tikai Supreme M40 (S24 paaudze / budžets)</option>
-          </select>
-        </div>
-      </div>
-    </div>
-
-    <div class="profile-card">
-      <div class="profile-sec-title">
-        <span>💶</span> <span>3. Cenas budžets un līmenis</span>
-      </div>
-      <div class="form-grid">
-        <div class="form-group">
-          <label for="p-min">Minimālā cena (€)</label>
-          <input type="number" id="p-min" value="${PROFILE.min}">
-        </div>
-
-        <div class="form-group">
-          <label for="p-max">Maksimālā cena (€)</label>
-          <input type="number" id="p-max" value="${PROFILE.max}">
-          <span class="form-helper">Ietverot orientējošās piegādes izmaksas.</span>
-        </div>
-
-        <div class="form-group">
-          <label for="p-level">Spēlēšanas intensitāte</label>
-          <select id="p-level">
-            <option value="amateur"${PROFILE.level === 'amateur' ? ' selected' : ''}>Amatieris (1–2 reizes nedēļā)</option>
-            <option value="regular"${PROFILE.level === 'regular' ? ' selected' : ''}>Regulārs spēlētājs (3–4 reizes nedēļā)</option>
-            <option value="pro"${PROFILE.level === 'pro' ? ' selected' : ''}>Pro / Junioru līgas (Augsta slodze)</option>
-          </select>
-        </div>
-      </div>
-    </div>
-
-    <div class="profile-actions">
-      <button type="button" id="btn-save-profile" class="btn-save-profile">Saglabāt profilu un atgriezties radarā</button>
-      <button type="button" id="btn-reset-profile" class="btn-reset-profile">Atiestatīt noklusējumu</button>
-      <div id="save-toast" class="save-toast">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-        <span>Profils veiksmīgi saglabāts!</span>
-      </div>
-    </div>
-  </div>`;
-}
-
-function viewUsed() {
-  return `<h1>Lietotas slidas</h1>
-  <p class="sub">Sludinājumu agregācija šobrīd nav automātiska. Apskati piedāvājumus tiešajos avotos:</p>
-  <div class="src">${USED_SOURCES.map(s => `<div class="card"><b>${s.name}</b><span class="badge b-no">Manuāls avots</span><a class="btn" href="${s.url}" target="_blank" rel="noopener">Atvērt ${s.name} →</a></div>`).join('')}</div>`;
-}
-
-function viewIntl() {
-  return `<h1>Ārzemju piedāvājumi</h1>
-  <p class="sub">Eiropas Savienības interneta veikali ar piegādi uz Latviju.</p>
-  <div class="empty">Veikalu saraksts tiek sagatavots. Tiks iekļauti pārbaudīti veikali ar skaidriem piegādes un atgriešanas nosacījumiem uz Latviju.</div>`;
-}
-
-function render() {
-  document.getElementById('nav').innerHTML = Object.entries(TABS)
-    .filter(([k]) => k !== 'profile')
-    .map(([k, t]) => `<button data-t="${k}" class="${S.tab === k ? 'on' : ''}">${t}</button>`).join('');
-
-  if (S.tab === 'new') document.getElementById('app').innerHTML = viewNew();
-  else if (S.tab === 'used') document.getElementById('app').innerHTML = viewUsed();
-  else if (S.tab === 'intl') document.getElementById('app').innerHTML = viewIntl();
-  else if (S.tab === 'profile') document.getElementById('app').innerHTML = viewProfile();
-}
-
-async function loadScrapedData() {
-  try {
-    const response = await fetch('scraped_data.json?t=' + Date.now());
-    if (!response.ok) throw new Error('scraped_data.json nav pieejams');
-    
-    const liveData = await response.json();
-    if (Array.isArray(liveData) && liveData.length > 0) {
-      liveData.forEach(item => {
-        const idx = OFFERS.findIndex(o => o.model === item.model && o.retailer === item.retailer);
-        if (idx !== -1) {
-          OFFERS[idx] = { ...OFFERS[idx], ...item };
-        } else {
-          OFFERS.push(item);
-        }
-      });
-      DATA_SYNC_SOURCE = 'GITHUB ACTIONS (LIVE)';
-      render();
-    }
-  } catch (err) {
-    console.info('Izmanto noklusētos datus:', err.message);
-  }
-}
-
-function toggleTheme() {
-  const current = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
-  const next = current === 'dark' ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', next);
-  localStorage.setItem('hsr_theme', next);
-}
-
-function toggleMenu(forceClose) {
-  const dropdown = document.getElementById('menu-dropdown');
-  const btn = document.getElementById('menu-btn');
-  if (!dropdown || !btn) return;
-
-  const shouldOpen = forceClose === undefined ? !dropdown.classList.contains('open') : !forceClose;
-  dropdown.classList.toggle('open', shouldOpen);
-  btn.classList.toggle('active', shouldOpen);
-  btn.setAttribute('aria-expanded', shouldOpen);
-}
-
-document.addEventListener('click', e => {
-  const th = e.target.closest('#theme-toggle');
-  if (th) { toggleTheme(); return; }
-
-  const mb = e.target.closest('#menu-btn');
-  if (mb) { 
-    toggleMenu(); 
-    return; 
-  }
-
-  if (!e.target.closest('.menu-box')) {
-    toggleMenu(true);
-  }
-
-  const op = e.target.closest('[data-open]');
-  if (op) {
-    e.preventDefault();
-    S.tab = op.dataset.open;
-    toggleMenu(true);
-    render();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    return;
-  }
-
-  const btnSave = e.target.closest('#btn-save-profile');
-  if (btnSave) {
-    PROFILE.size = document.getElementById('p-size').value;
-    PROFILE.fit = document.getElementById('p-fit').value;
-    PROFILE.role = document.getElementById('p-role').value;
-    PROFILE.prefModel = document.getElementById('p-prefModel').value;
-    PROFILE.min = +document.getElementById('p-min').value || 0;
-    PROFILE.max = +document.getElementById('p-max').value || 99999;
-    PROFILE.level = document.getElementById('p-level').value;
-
-    localStorage.setItem('hsr_user_profile', JSON.stringify(PROFILE));
-
-    const toast = document.getElementById('save-toast');
-    if (toast) {
-      toast.style.display = 'inline-flex';
-      setTimeout(() => {
-        S.tab = 'new';
-        render();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }, 700);
-    }
-    return;
-  }
-
-  const btnReset = e.target.closest('#btn-reset-profile');
-  if (btnReset) {
-    PROFILE = { ...DEFAULT_PROFILE };
-    localStorage.removeItem('hsr_user_profile');
-    render();
-    return;
-  }
-
-  const t = e.target.closest('[data-t]'), v = e.target.closest('[data-v]');
-  if (t) { S.tab = t.dataset.t; render(); }
-  if (v) { S.view = v.dataset.v; render(); }
-
-  const g = e.target.closest('[data-go]');
-  if (g) window.scrollTo({ top: g.dataset.go === 'bottom' ? document.body.scrollHeight : 0, behavior: 'smooth' });
-});
-
-document.addEventListener('change', e => {
-  const id = e.target.id;
-  if (id === 'f-sort') S.sort = e.target.value;
-  else if (id === 'f-stock') S.stock = e.target.checked;
-  else return;
-  render();
-});
-
-render();
-loadScrapedData();
-</script>
-</body>
-</html>
+  <!-- MAIN WRAP -->
+  <main class="main-wrap">
