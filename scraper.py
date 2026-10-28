@@ -1,347 +1,252 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-HOCKEY SKATE RADAR — Datu vākšanas un sinhronizācijas skripts
---------------------------------------------------------------
-Skenē Latvijas hokeja veikalus (Hokeja Pasaule, Hokejam.lv, Sportega),
-nolasot cenas un pieejamību, izmantojot gan HTML selektorus,
-gan e-veikalu strukturētos datus (Schema.org / JSON-LD).
-"""
-
+import requests
+from bs4 import BeautifulSoup
 import json
-import logging
 import re
-import sys
-import time
 from datetime import datetime
-from typing import Dict, List, Optional
-from urllib.parse import urljoin
+import time
 
-try:
-    import requests
-    from bs4 import BeautifulSoup
-except ImportError:
-    print("KĻŪDA: Trūkst bibliotēku. Palaid: pip install requests beautifulsoup4")
-    sys.exit(1)
-
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[logging.StreamHandler(sys.stdout)]
-)
-
-HTTP_HEADERS = {
-    "User-Agent": (
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-        "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
-    ),
-    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-    "Accept-Language": "lv-LV,lv;q=0.9,en-US;q=0.8,en;q=0.7",
-    "Cache-Control": "no-cache",
-    "Pragma": "no-cache",
-}
-
-RETAILERS = {
-    "hp": {"name": "Hokeja Pasaule", "shipping": 3.50, "base_url": "https://hokejapasaule.lv"},
-    "hj": {"name": "Hokejam.lv",     "shipping": 0.00, "base_url": "https://www.hokejam.lv"},
-    "sp": {"name": "Sportega",       "shipping": 4.00, "base_url": "https://www.sportega.lv"},
+HEADERS = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+    'Accept-Language': 'lv,en;q=0.9',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
 }
 
 TARGET_SKATES = [
+    # Bauer Vapor FLY40
     {
-        "id": "bauer-vapor-fly40",
-        "name": "Bauer Vapor FLY40",
-        "urls": {
-            # Hokeja Pasaule tiešā pieaugušo preces lapa
-            "hp": "https://hokejapasaule.lv/lv_lv/bauer-vapor-s25-fly40-senior-hokeja-slidas",
-            # Hokejam.lv meklēšanas lapa (šobrīd pieejams tikai Junior)
-            "hj": "https://www.hokejam.lv/lv/search?s=Vapor+FLY40",
-            # Sportega tiešā pieaugušo preces lapa
-            "sp": "https://www.sportega.lv/hokeja-slidas-bauer-vapor-fly40-senior/d1502757",
-        }
+        "model": "bauer-vapor-fly40",
+        "retailer": "hp",
+        "url": "https://hokejapasaule.lv/lv_lv/bauer-vapor-s25-fly40-senior-hokeja-slidas",
+        "default_sizes": ["7", "7.5"],
+        "default_fits": ["FIT 2"],
+        "shipping": 3.5
     },
     {
-        "id": "bauer-supreme-f40",
-        "name": "Bauer Supreme F40",
-        "urls": {
-            # Hokeja Pasaule tiešā pieaugušo preces lapa
-            "hp": "https://hokejapasaule.lv/lv_lv/bauer-supreme-s26-f40-senior-hokeja-slidas",
-            # Hokejam.lv tiešā pieaugušo preces lapa
-            "hj": "https://www.hokejam.lv/lv/pieauguso-hokeja-slidas/5455-bauer-supreme-f40-s26-pieauguso-hokeja-slidas",
-            # Sportega meklēšanas lapa
-            "sp": "https://www.sportega.lv/hladat?q=Supreme+F40",
-        }
+        "model": "bauer-vapor-fly40",
+        "retailer": "hj",
+        "url": "https://www.hokejam.lv/lv/meklesana?search=FLY40",
+        "default_sizes": ["7", "7.5"],
+        "default_fits": ["FIT 2"],
+        "shipping": 0.0
     },
     {
-        "id": "bauer-supreme-m40",
-        "name": "Bauer Supreme M40",
-        "urls": {
-            # Hokeja Pasaule tiešā pieaugušo preces lapa
-            "hp": "https://hokejapasaule.lv/lv_lv/bauer-supreme-s24-m40-senior-hokeja-slidas",
-            # Hokejam.lv tiešā pieaugušo preces lapa
-            "hj": "https://www.hokejam.lv/lv/pieauguso-hokeja-slidas/4507-bauer-supreme-m40-pieauguso-hokeja-slidas",
-            # Sportega meklēšanas lapa
-            "sp": "https://www.sportega.lv/hladat?q=Supreme+M40",
-        }
+        "model": "bauer-vapor-fly40",
+        "retailer": "sp",
+        "url": "https://www.sportega.lv/hokeja-slidas-bauer-vapor-fly40-senior/d1502757",
+        "default_sizes": ["7", "7.5"],
+        "default_fits": ["FIT 2"],
+        "shipping": 4.0
+    },
+    # Bauer Supreme F40
+    {
+        "model": "bauer-supreme-f40",
+        "retailer": "hp",
+        "url": "https://hokejapasaule.lv/lv_lv/bauer-supreme-s26-f40-senior-hokeja-slidas",
+        "default_sizes": ["7", "7.5"],
+        "default_fits": ["FIT 2"],
+        "shipping": 3.5
+    },
+    {
+        "model": "bauer-supreme-f40",
+        "retailer": "hj",
+        "url": "https://www.hokejam.lv/lv/pieauguso-hokeja-slidas/5455-bauer-supreme-s26-f40-pieauguso-hokeja-slidas",
+        "default_sizes": ["7", "7.5"],
+        "default_fits": ["FIT 2"],
+        "shipping": 0.0
+    },
+    {
+        "model": "bauer-supreme-f40",
+        "retailer": "sp",
+        "url": "https://www.sportega.lv/hladat?q=Supreme+F40",
+        "default_sizes": ["7", "7.5"],
+        "default_fits": ["FIT 3"],
+        "shipping": 4.0
+    },
+    # Bauer Supreme M40
+    {
+        "model": "bauer-supreme-m40",
+        "retailer": "hp",
+        "url": "https://hokejapasaule.lv/lv_lv/bauer-supreme-s24-m40-senior-hokeja-slidas",
+        "default_sizes": ["7.5"],
+        "default_fits": ["FIT 2"],
+        "shipping": 3.5
+    },
+    {
+        "model": "bauer-supreme-m40",
+        "retailer": "hj",
+        "url": "https://www.hokejam.lv/lv/pieauguso-hokeja-slidas/4507-bauer-supreme-m40-pieauguso-hokeja-slidas",
+        "default_sizes": ["7", "7.5"],
+        "default_fits": ["FIT 2"],
+        "shipping": 0.0
+    },
+    {
+        "model": "bauer-supreme-m40",
+        "retailer": "sp",
+        "url": "https://www.sportega.lv/hladat?q=Supreme+M40",
+        "default_sizes": ["8"],
+        "default_fits": ["FIT 2"],
+        "shipping": 4.0
     }
 ]
 
+def parse_hokejapasaule(url):
+    try:
+        resp = requests.get(url, headers=HEADERS, timeout=12)
+        if resp.status_code != 200:
+            return None, None, False
+        soup = BeautifulSoup(resp.text, 'html.parser')
 
-class HockeySkateScraper:
-    def __init__(self):
-        self.session = requests.Session()
-        self.session.headers.update(HTTP_HEADERS)
-
-    def fetch_page(self, url: str) -> Optional[BeautifulSoup]:
-        try:
-            logging.info(f"Pārbauda saiti: {url}")
-            response = self.session.get(url, timeout=14)
-            if response.status_code == 200:
-                return BeautifulSoup(response.text, "html.parser")
-            logging.warning(f"Statuss {response.status_code}: {url}")
-            return None
-        except requests.RequestException as err:
-            logging.error(f"Tīkla kļūda apmeklējot {url}: {err}")
-            return None
-
-    def clean_price(self, text: Optional[str]) -> Optional[float]:
-        if not text:
-            return None
-        cleaned = re.sub(r"[^\d,\.]", "", str(text)).replace(",", ".")
-        if cleaned.count(".") > 1:
-            parts = cleaned.split(".")
-            cleaned = "".join(parts[:-1]) + "." + parts[-1]
-        try:
-            val = float(cleaned)
-            return round(val, 2) if val > 0 else None
-        except ValueError:
-            return None
-
-    def extract_json_ld(self, soup: BeautifulSoup) -> Dict:
-        """Nolasa e-veikalu strukturētos datus (Schema.org / JSON-LD)."""
-        data = {"price": None, "stock": None}
-        for tag in soup.find_all("script", type="application/ld+json"):
+        # 1. Cenas meklēšana Schema.org datos
+        for s in soup.find_all('script', type='application/ld+json'):
             try:
-                raw = tag.string or tag.text
-                if not raw:
-                    continue
-                parsed = json.loads(raw.strip())
-                items = parsed if isinstance(parsed, list) else [parsed]
-                for item in items:
-                    if isinstance(item, dict) and item.get("@type") == "Product":
-                        offers = item.get("offers")
-                        if isinstance(offers, list) and len(offers) > 0:
-                            offers = offers[0]
-                        if isinstance(offers, dict):
-                            p = offers.get("price") or offers.get("lowPrice")
-                            if p:
-                                data["price"] = self.clean_price(str(p))
-                            avail = str(offers.get("availability", "")).lower()
-                            if "instock" in avail or "instoreonly" in avail:
-                                data["stock"] = True
-                            elif "outofstock" in avail:
-                                data["stock"] = False
-                            return data
+                data = json.loads(s.string or '')
+                if isinstance(data, list):
+                    data = data[0]
+                if data.get('@type') == 'Product' or 'offers' in data:
+                    offers = data.get('offers', {})
+                    if isinstance(offers, list):
+                        offers = offers[0]
+                    p = offers.get('price')
+                    if p:
+                        avail = str(offers.get('availability', '')).lower()
+                        in_stock = 'instock' in avail
+                        return float(p), None, in_stock
             except Exception:
                 continue
-        return data
 
-    def extract_meta_price(self, soup: BeautifulSoup) -> Optional[float]:
-        itemprop = soup.find(attrs={"itemprop": "price"})
-        if itemprop:
-            content = itemprop.get("content") or itemprop.text
-            p = self.clean_price(content)
-            if p:
-                return p
+        # 2. Rezerves meklēšana HTML celtnē
+        price_el = soup.select_one('[data-price-type="finalPrice"] .price, .special-price .price, .price-final_price .price')
+        price = None
+        if price_el:
+            digits = re.findall(r'\d+(?:[.,]\d+)?', price_el.text)
+            if digits:
+                price = float(digits[0].replace(',', '.'))
 
-        meta_og = soup.find("meta", property=re.compile(r"price:amount$", re.I))
-        if meta_og and meta_og.get("content"):
-            p = self.clean_price(meta_og["content"])
-            if p:
-                return p
+        old_el = soup.select_one('.old-price .price')
+        old_price = None
+        if old_el:
+            digits = re.findall(r'\d+(?:[.,]\d+)?', old_el.text)
+            if digits:
+                old_price = float(digits[0].replace(',', '.'))
 
-        return None
+        in_stock = bool(soup.select_one('#product-addtocart-button, .stock.available'))
+        return price, old_price, in_stock
+    except Exception as e:
+        print(f"Kļūda HP lapā: {e}")
+        return None, None, False
 
-    def parse_hokeja_pasaule(self, soup: BeautifulSoup, target_url: str) -> Dict:
-        res = {"price": None, "oldPrice": None, "stock": False, "sizes": ["7", "7.5"], "fits": ["FIT 2"], "url": target_url}
+def parse_hokejam(url):
+    try:
+        resp = requests.get(url, headers=HEADERS, timeout=12)
+        if resp.status_code != 200:
+            return None, None, False
+        soup = BeautifulSoup(resp.text, 'html.parser')
 
-        # 1. Strukturētie dati (JSON-LD)
-        ld = self.extract_json_ld(soup)
-        if ld.get("price"):
-            res["price"] = ld["price"]
-        if ld.get("stock") is not None:
-            res["stock"] = ld["stock"]
+        price_el = soup.select_one('.current-price [itemprop="price"], .current-price-value, .product-price')
+        price = None
+        if price_el:
+            val = price_el.get('content') or price_el.text
+            digits = re.findall(r'\d+(?:[.,]\d+)?', val)
+            if digits:
+                price = float(digits[0].replace(',', '.'))
 
-        # 2. Meta tagi
-        if not res["price"]:
-            res["price"] = self.extract_meta_price(soup)
+        old_el = soup.select_one('.regular-price, .old-price')
+        old_price = None
+        if old_el:
+            digits = re.findall(r'\d+(?:[.,]\d+)?', old_el.text)
+            if digits:
+                old_price = float(digits[0].replace(',', '.'))
 
-        # 3. HTML cenu bloki (Magento 2 / Porto motīvs)
-        if not res["price"]:
-            price_box = soup.select_one(
-                ".product-info-price .price, [data-price-type='finalPrice'] .price, "
-                ".price-box .price, .price-final_price .price, .special-price .price, .price-wrapper .price"
-            )
-            if price_box:
-                res["price"] = self.clean_price(price_box.text)
+        cart_btn = soup.select_one('.add-to-cart, button[data-button-action="add-to-cart"]')
+        in_stock = cart_btn is not None and not cart_btn.has_attr('disabled')
+        return price, old_price, in_stock
+    except Exception as e:
+        print(f"Kļūda Hokejam.lv: {e}")
+        return None, None, False
 
-        old_box = soup.select_one(".old-price .price, [data-price-type='oldPrice'] .price")
-        if old_box:
-            res["oldPrice"] = self.clean_price(old_box.text)
+def parse_sportega(url):
+    try:
+        resp = requests.get(url, headers=HEADERS, timeout=12)
+        if resp.status_code != 200:
+            return None, None, False
+        soup = BeautifulSoup(resp.text, 'html.parser')
 
-        # 4. Noliktavas statuss
-        if res["price"] and not res["stock"]:
-            prod_info = soup.select_one(".product-info-main, .product-add-form") or soup
-            btn = prod_info.select_one("#product-addtocart-button, button.tocart, .action.tocart, button[title*='grozā' i]")
-            has_stock_tag = bool(soup.select_one(".stock.available, .product-info-stock-sku"))
-            page_text = prod_info.get_text().lower()
+        for s in soup.find_all('script', type='application/ld+json'):
+            try:
+                data = json.loads(s.string or '')
+                if isinstance(data, list):
+                    data = data[0]
+                if data.get('@type') == 'Product' or 'offers' in data:
+                    offers = data.get('offers', {})
+                    if isinstance(offers, list):
+                        offers = offers[0]
+                    p = offers.get('price')
+                    if p:
+                        avail = str(offers.get('availability', '')).lower()
+                        in_stock = 'instock' in avail or 'preorder' in avail
+                        return float(p), None, in_stock
+            except Exception:
+                continue
 
-            if (btn and not btn.has_attr("disabled")) or has_stock_tag or ("ir noliktavā" in page_text):
-                res["stock"] = True
+        p_match = re.search(r'(\d+[\d\s]*(?:[.,]\d{2})?)\s*€', soup.text)
+        if p_match:
+            clean = re.sub(r'[^\d.]', '', p_match.group(1).replace(',', '.'))
+            if clean:
+                return float(clean), None, True
+
+        return None, None, False
+    except Exception as e:
+        print(f"Kļūda Sportega: {e}")
+        return None, None, False
+
+def scrape_all():
+    print("Sākas hokeja slidu cenu skenēšana...")
+    updated_offers = []
+
+    for t in TARGET_SKATES:
+        print(f"Pārbauda: {t['retailer'].upper()} -> {t['model']}")
+        try:
+            if t['retailer'] == 'hp':
+                price, old_price, stock = parse_hokejapasaule(t['url'])
+            elif t['retailer'] == 'hj':
+                price, old_price, stock = parse_hokejam(t['url'])
+            elif t['retailer'] == 'sp':
+                price, old_price, stock = parse_sportega(t['url'])
             else:
-                res["stock"] = True
+                price, old_price, stock = None, None, False
+        except Exception as e:
+            print(f"Neapstrādāta kļūda pie {t['url']}: {e}")
+            price, old_price, stock = None, None, False
 
-        return res
+        time.sleep(1)
 
-    def parse_hokejam_lv(self, soup: BeautifulSoup, target_url: str) -> Dict:
-        res = {"price": None, "oldPrice": None, "stock": False, "sizes": ["7", "7.5"], "fits": ["FIT 2"], "url": target_url}
+        status = 'VERIFIED' if (price is not None and stock) else 'UNVERIFIED'
 
-        ld = self.extract_json_ld(soup)
-        if ld.get("price"):
-            res["price"] = ld["price"]
-        if ld.get("stock") is not None:
-            res["stock"] = ld["stock"]
+        offer = {
+            "model": t["model"],
+            "retailer": t["retailer"],
+            "section": "new",
+            "price": price if price is not None else 0.0,
+            "oldPrice": old_price,
+            "shipping": t["shipping"],
+            "sizes": t["default_sizes"],
+            "fits": t["default_fits"],
+            "stock": stock,
+            "checked": datetime.now().strftime("%Y-%m-%d"),
+            "url": t["url"],
+            "status": status
+        }
+        updated_offers.append(offer)
 
-        if not res["price"]:
-            res["price"] = self.extract_meta_price(soup)
+    payload = {
+        "updatedAt": datetime.now().isoformat(),
+        "offers": updated_offers
+    }
 
-        if not res["price"]:
-            price_box = soup.select_one(".current-price span[content], .current-price, .product-price, .price")
-            if price_box:
-                res["price"] = self.clean_price(price_box.get("content") or price_box.text)
+    with open('scraped_data.json', 'w', encoding='utf-8') as f:
+        json.dump(payload, f, indent=2, ensure_ascii=False)
 
-        old_box = soup.select_one(".regular-price, .old-price")
-        if old_box:
-            res["oldPrice"] = self.clean_price(old_box.text)
+    print("Skenēšana pabeigta un scraped_data.json veiksmīgi atjaunināts.")
 
-        if not res["price"]:
-            item = soup.select_one(".product-miniature, .product-item, .item-inner")
-            if item:
-                link = item.select_one("a.product-thumbnail, a[href]")
-                if link and link.get("href"):
-                    res["url"] = link["href"]
-                p_elem = item.select_one(".price, .product-price")
-                if p_elem:
-                    res["price"] = self.clean_price(p_elem.text)
-
-        if res["price"]:
-            avail_elem = soup.select_one("#product-availability, .product-availability")
-            if avail_elem:
-                txt = avail_elem.get_text().lower()
-                res["stock"] = "nav" not in txt and "out" not in txt
-            else:
-                res["stock"] = True
-
-        return res
-
-    def parse_sportega(self, soup: BeautifulSoup, target_url: str) -> Dict:
-        res = {"price": None, "oldPrice": None, "stock": False, "sizes": ["7", "7.5"], "fits": ["FIT 2"], "url": target_url}
-
-        ld = self.extract_json_ld(soup)
-        if ld.get("price"):
-            res["price"] = ld["price"]
-        if ld.get("stock") is not None:
-            res["stock"] = ld["stock"]
-
-        if not res["price"]:
-            res["price"] = self.extract_meta_price(soup)
-
-        if not res["price"]:
-            p_elem = soup.select_one(".c-price__current, .product-detail__price, .price, .c-price, .product-price")
-            if p_elem:
-                res["price"] = self.clean_price(p_elem.text)
-
-        old_elem = soup.select_one(".c-price__original, .old-price")
-        if old_elem:
-            res["oldPrice"] = self.clean_price(old_elem.text)
-
-        if not res["price"]:
-            item = soup.select_one(".c-product-box, .product-box")
-            if item:
-                link = item.select_one("a[href]")
-                if link and link.get("href"):
-                    res["url"] = urljoin(RETAILERS["sp"]["base_url"], link["href"])
-                p_elem = item.select_one(".c-price__current, .price")
-                if p_elem:
-                    res["price"] = self.clean_price(p_elem.text)
-
-        if res["price"]:
-            page_text = soup.get_text().lower()
-            btn = soup.select_one("button[name='add-to-cart'], button.btn--cart, .product-detail__add-to-cart, button:has-text('Ielikt')")
-            if "nav pieejams" in page_text or "izpārdots" in page_text or "uz laiku" in page_text:
-                res["stock"] = False
-            else:
-                res["stock"] = True
-
-        return res
-
-    def run(self) -> List[Dict]:
-        today = datetime.now().strftime("%Y-%m-%d")
-        all_offers = []
-
-        logging.info("=== HOCKEY SKATE RADAR SKANĒŠANA SĀKTA ===")
-
-        for skate in TARGET_SKATES:
-            model_id = skate["id"]
-            model_name = skate["name"]
-            logging.info(f"--- Skenē modeli: {model_name} ---")
-
-            for r_key, url in skate["urls"].items():
-                ret_info = RETAILERS[r_key]
-                time.sleep(1.0)
-
-                soup = self.fetch_page(url)
-                parsed = {}
-
-                if soup:
-                    if r_key == "hp":
-                        parsed = self.parse_hokeja_pasaule(soup, url)
-                    elif r_key == "hj":
-                        parsed = self.parse_hokejam_lv(soup, url)
-                    elif r_key == "sp":
-                        parsed = self.parse_sportega(soup, url)
-
-                is_verified = parsed.get("price") is not None and parsed.get("stock", False)
-
-                offer = {
-                    "model": model_id,
-                    "retailer": r_key,
-                    "section": "new",
-                    "price": parsed.get("price"),
-                    "oldPrice": parsed.get("oldPrice"),
-                    "shipping": ret_info["shipping"],
-                    "sizes": parsed.get("sizes", ["7", "7.5"]),
-                    "fits": parsed.get("fits", ["FIT 2"]),
-                    "stock": parsed.get("stock", False),
-                    "checked": today if is_verified else None,
-                    "url": parsed.get("url") or url,
-                    "status": "VERIFIED" if is_verified else "DEMO"
-                }
-
-                all_offers.append(offer)
-                logging.info(
-                    f"[{ret_info['name']}] Rezultāts: {offer['price']} € | Noliktavā: {offer['stock']} | Statuss: {offer['status']}"
-                )
-
-        output_file = "scraped_data.json"
-        with open(output_file, "w", encoding="utf-8") as f:
-            json.dump(all_offers, f, ensure_ascii=False, indent=2)
-
-        logging.info(f"Saglabāts failā {output_file}")
-        logging.info("=== SKANĒŠANA PABEIGTA ===")
-        return all_offers
-
-
-if __name__ == "__main__":
-    scraper = HockeySkateScraper()
-    scraper.run()
+if __name__ == '__main__':
+    scrape_all()
