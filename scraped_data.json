@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-28T19:20:51.213510",
+  "updatedAt": "2026-10-28T19:41:42.063496",
   "offers": [
     {
       "model": "bauer-vapor-fly40",
@@ -43,7 +43,7 @@
       "model": "bauer-vapor-fly40",
       "retailer": "sp",
       "section": "new",
-      "price": 934.99,
+      "price": 464.99,
       "oldPrice": null,
       "shipping": 4.0,
       "sizes": [
@@ -123,6 +123,7 @@
       "oldPrice": null,
       "shipping": 3.5,
       "sizes": [
+        "7",
         "7.5"
       ],
       "fits": [
@@ -156,7 +157,7 @@
       "model": "bauer-supreme-m40",
       "retailer": "sp",
       "section": "new",
-      "price": 934.99,
+      "price": 379.99,
       "oldPrice": null,
       "shipping": 4.0,
       "sizes": [
