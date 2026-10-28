@@ -4,7 +4,8 @@
 HOCKEY SKATE RADAR — Datu vākšanas un sinhronizācijas skripts
 --------------------------------------------------------------
 Skenē Latvijas hokeja veikalus (Hokeja Pasaule, Hokejam.lv, Sportega),
-precīzi nolasot cenas un pieejamību konkrētajā preces pirkšanas blokā.
+nolasot cenas un pieejamību, izmantojot gan HTML selektorus,
+gan e-veikalu strukturētos datus (Schema.org / JSON-LD).
 """
 
 import json
@@ -53,10 +54,10 @@ TARGET_SKATES = [
         "urls": {
             # Hokeja Pasaule tiešā pieaugušo preces lapa
             "hp": "https://hokejapasaule.lv/lv_lv/bauer-vapor-s25-fly40-senior-hokeja-slidas",
-            # Hokejam.lv meklēšanas lapa Vapor FLY40
+            # Hokejam.lv meklēšanas lapa (šobrīd pieejams tikai Junior)
             "hj": "https://www.hokejam.lv/lv/search?s=Vapor+FLY40",
-            # Sportega meklēšanas lapa
-            "sp": "https://www.sportega.lv/hladat?q=Bauer+Vapor",
+            # Sportega tiešā pieaugušo preces lapa
+            "sp": "https://www.sportega.lv/hokeja-slidas-bauer-vapor-fly40-senior/d1502757",
         }
     },
     {
@@ -75,7 +76,7 @@ TARGET_SKATES = [
         "id": "bauer-supreme-m40",
         "name": "Bauer Supreme M40",
         "urls": {
-            # Hokeja Pasaule tiešā pieaugušo preces lapa (izlabots latviskais nosaukums)
+            # Hokeja Pasaule tiešā pieaugušo preces lapa
             "hp": "https://hokejapasaule.lv/lv_lv/bauer-supreme-s24-m40-senior-hokeja-slidas",
             # Hokejam.lv tiešā pieaugušo preces lapa
             "hj": "https://www.hokejam.lv/lv/pieauguso-hokeja-slidas/4507-bauer-supreme-m40-pieauguso-hokeja-slidas",
@@ -106,7 +107,7 @@ class HockeySkateScraper:
     def clean_price(self, text: Optional[str]) -> Optional[float]:
         if not text:
             return None
-        cleaned = re.sub(r"[^\d,\.]", "", text).replace(",", ".")
+        cleaned = re.sub(r"[^\d,\.]", "", str(text)).replace(",", ".")
         if cleaned.count(".") > 1:
             parts = cleaned.split(".")
             cleaned = "".join(parts[:-1]) + "." + parts[-1]
@@ -115,6 +116,35 @@ class HockeySkateScraper:
             return round(val, 2) if val > 0 else None
         except ValueError:
             return None
+
+    def extract_json_ld(self, soup: BeautifulSoup) -> Dict:
+        """Nolasa e-veikalu strukturētos datus (Schema.org / JSON-LD)."""
+        data = {"price": None, "stock": None}
+        for tag in soup.find_all("script", type="application/ld+json"):
+            try:
+                raw = tag.string or tag.text
+                if not raw:
+                    continue
+                parsed = json.loads(raw.strip())
+                items = parsed if isinstance(parsed, list) else [parsed]
+                for item in items:
+                    if isinstance(item, dict) and item.get("@type") == "Product":
+                        offers = item.get("offers")
+                        if isinstance(offers, list) and len(offers) > 0:
+                            offers = offers[0]
+                        if isinstance(offers, dict):
+                            p = offers.get("price") or offers.get("lowPrice")
+                            if p:
+                                data["price"] = self.clean_price(str(p))
+                            avail = str(offers.get("availability", "")).lower()
+                            if "instock" in avail or "instoreonly" in avail:
+                                data["stock"] = True
+                            elif "outofstock" in avail:
+                                data["stock"] = False
+                            return data
+            except Exception:
+                continue
+        return data
 
     def extract_meta_price(self, soup: BeautifulSoup) -> Optional[float]:
         itemprop = soup.find(attrs={"itemprop": "price"})
@@ -135,11 +165,23 @@ class HockeySkateScraper:
     def parse_hokeja_pasaule(self, soup: BeautifulSoup, target_url: str) -> Dict:
         res = {"price": None, "oldPrice": None, "stock": False, "sizes": ["7", "7.5"], "fits": ["FIT 2"], "url": target_url}
 
-        # 1. Cenas nolasīšana
-        res["price"] = self.extract_meta_price(soup)
+        # 1. Strukturētie dati (JSON-LD)
+        ld = self.extract_json_ld(soup)
+        if ld.get("price"):
+            res["price"] = ld["price"]
+        if ld.get("stock") is not None:
+            res["stock"] = ld["stock"]
 
+        # 2. Meta tagi
         if not res["price"]:
-            price_box = soup.select_one("[data-price-type='finalPrice'] .price, .price-final_price .price, .special-price .price, .price-wrapper .price")
+            res["price"] = self.extract_meta_price(soup)
+
+        # 3. HTML cenu bloki (Magento 2 / Porto motīvs)
+        if not res["price"]:
+            price_box = soup.select_one(
+                ".product-info-price .price, [data-price-type='finalPrice'] .price, "
+                ".price-box .price, .price-final_price .price, .special-price .price, .price-wrapper .price"
+            )
             if price_box:
                 res["price"] = self.clean_price(price_box.text)
 
@@ -147,18 +189,15 @@ class HockeySkateScraper:
         if old_box:
             res["oldPrice"] = self.clean_price(old_box.text)
 
-        # 2. Precīza pieejamības noteikšana (tikai produkta pirkšanas blokā)
-        if res["price"]:
+        # 4. Noliktavas statuss
+        if res["price"] and not res["stock"]:
             prod_info = soup.select_one(".product-info-main, .product-add-form") or soup
-            info_text = prod_info.get_text().lower()
+            btn = prod_info.select_one("#product-addtocart-button, button.tocart, .action.tocart, button[title*='grozā' i]")
+            has_stock_tag = bool(soup.select_one(".stock.available, .product-info-stock-sku"))
+            page_text = prod_info.get_text().lower()
 
-            has_add_button = prod_info.select_one("#product-addtocart-button, button.tocart, .action.tocart") is not None
-            has_stock_tag = "ir noliktavā" in info_text or "in stock" in info_text
-
-            if has_add_button or has_stock_tag:
+            if (btn and not btn.has_attr("disabled")) or has_stock_tag or ("ir noliktavā" in page_text):
                 res["stock"] = True
-            elif "nav noliktavā" in info_text:
-                res["stock"] = False
             else:
                 res["stock"] = True
 
@@ -167,7 +206,14 @@ class HockeySkateScraper:
     def parse_hokejam_lv(self, soup: BeautifulSoup, target_url: str) -> Dict:
         res = {"price": None, "oldPrice": None, "stock": False, "sizes": ["7", "7.5"], "fits": ["FIT 2"], "url": target_url}
 
-        res["price"] = self.extract_meta_price(soup)
+        ld = self.extract_json_ld(soup)
+        if ld.get("price"):
+            res["price"] = ld["price"]
+        if ld.get("stock") is not None:
+            res["stock"] = ld["stock"]
+
+        if not res["price"]:
+            res["price"] = self.extract_meta_price(soup)
 
         if not res["price"]:
             price_box = soup.select_one(".current-price span[content], .current-price, .product-price, .price")
@@ -201,10 +247,17 @@ class HockeySkateScraper:
     def parse_sportega(self, soup: BeautifulSoup, target_url: str) -> Dict:
         res = {"price": None, "oldPrice": None, "stock": False, "sizes": ["7", "7.5"], "fits": ["FIT 2"], "url": target_url}
 
-        res["price"] = self.extract_meta_price(soup)
+        ld = self.extract_json_ld(soup)
+        if ld.get("price"):
+            res["price"] = ld["price"]
+        if ld.get("stock") is not None:
+            res["stock"] = ld["stock"]
 
         if not res["price"]:
-            p_elem = soup.select_one(".c-price__current, .product-detail__price, .price")
+            res["price"] = self.extract_meta_price(soup)
+
+        if not res["price"]:
+            p_elem = soup.select_one(".c-price__current, .product-detail__price, .price, .c-price, .product-price")
             if p_elem:
                 res["price"] = self.clean_price(p_elem.text)
 
@@ -223,7 +276,12 @@ class HockeySkateScraper:
                     res["price"] = self.clean_price(p_elem.text)
 
         if res["price"]:
-            res["stock"] = True
+            page_text = soup.get_text().lower()
+            btn = soup.select_one("button[name='add-to-cart'], button.btn--cart, .product-detail__add-to-cart, button:has-text('Ielikt')")
+            if "nav pieejams" in page_text or "izpārdots" in page_text or "uz laiku" in page_text:
+                res["stock"] = False
+            else:
+                res["stock"] = True
 
         return res
 
