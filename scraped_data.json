@@ -1,0 +1,173 @@
+[
+  {
+    "model": "bauer-vapor-fly40",
+    "retailer": "hp",
+    "section": "new",
+    "price": null,
+    "oldPrice": null,
+    "shipping": 3.5,
+    "sizes": [
+      "7",
+      "7.5"
+    ],
+    "fits": [
+      "FIT 2"
+    ],
+    "stock": false,
+    "checked": null,
+    "url": "https://hokejapasaule.lv/meklesana?search=Vapor+FLY40",
+    "status": "DEMO"
+  },
+  {
+    "model": "bauer-vapor-fly40",
+    "retailer": "hj",
+    "section": "new",
+    "price": null,
+    "oldPrice": null,
+    "shipping": 0.0,
+    "sizes": [
+      "7",
+      "7.5"
+    ],
+    "fits": [
+      "FIT 2"
+    ],
+    "stock": false,
+    "checked": null,
+    "url": "https://www.hokejam.lv/lv/meklet?keyword=Vapor+FLY40",
+    "status": "DEMO"
+  },
+  {
+    "model": "bauer-vapor-fly40",
+    "retailer": "sp",
+    "section": "new",
+    "price": null,
+    "oldPrice": null,
+    "shipping": 4.0,
+    "sizes": [
+      "7",
+      "7.5"
+    ],
+    "fits": [
+      "FIT 2"
+    ],
+    "stock": false,
+    "checked": null,
+    "url": "https://www.sportega.lv/meklet?q=Vapor+FLY40",
+    "status": "DEMO"
+  },
+  {
+    "model": "bauer-supreme-f40",
+    "retailer": "hp",
+    "section": "new",
+    "price": null,
+    "oldPrice": null,
+    "shipping": 3.5,
+    "sizes": [
+      "7",
+      "7.5"
+    ],
+    "fits": [
+      "FIT 2"
+    ],
+    "stock": false,
+    "checked": null,
+    "url": "https://hokejapasaule.lv/meklesana?search=Supreme+F40",
+    "status": "DEMO"
+  },
+  {
+    "model": "bauer-supreme-f40",
+    "retailer": "hj",
+    "section": "new",
+    "price": null,
+    "oldPrice": null,
+    "shipping": 0.0,
+    "sizes": [
+      "7",
+      "7.5"
+    ],
+    "fits": [
+      "FIT 2"
+    ],
+    "stock": false,
+    "checked": null,
+    "url": "https://www.hokejam.lv/lv/meklet?keyword=Supreme+F40",
+    "status": "DEMO"
+  },
+  {
+    "model": "bauer-supreme-f40",
+    "retailer": "sp",
+    "section": "new",
+    "price": null,
+    "oldPrice": null,
+    "shipping": 4.0,
+    "sizes": [
+      "7",
+      "7.5"
+    ],
+    "fits": [
+      "FIT 2"
+    ],
+    "stock": false,
+    "checked": null,
+    "url": "https://www.sportega.lv/meklet?q=Supreme+F40",
+    "status": "DEMO"
+  },
+  {
+    "model": "bauer-supreme-m40",
+    "retailer": "hp",
+    "section": "new",
+    "price": null,
+    "oldPrice": null,
+    "shipping": 3.5,
+    "sizes": [
+      "7",
+      "7.5"
+    ],
+    "fits": [
+      "FIT 2"
+    ],
+    "stock": false,
+    "checked": null,
+    "url": "https://hokejapasaule.lv/meklesana?search=Supreme+M40",
+    "status": "DEMO"
+  },
+  {
+    "model": "bauer-supreme-m40",
+    "retailer": "hj",
+    "section": "new",
+    "price": null,
+    "oldPrice": null,
+    "shipping": 0.0,
+    "sizes": [
+      "7",
+      "7.5"
+    ],
+    "fits": [
+      "FIT 2"
+    ],
+    "stock": false,
+    "checked": null,
+    "url": "https://www.hokejam.lv/lv/meklet?keyword=Supreme+M40",
+    "status": "DEMO"
+  },
+  {
+    "model": "bauer-supreme-m40",
+    "retailer": "sp",
+    "section": "new",
+    "price": null,
+    "oldPrice": null,
+    "shipping": 4.0,
+    "sizes": [
+      "7",
+      "7.5"
+    ],
+    "fits": [
+      "FIT 2"
+    ],
+    "stock": false,
+    "checked": null,
+    "url": "https://www.sportega.lv/meklet?q=Supreme+M40",
+    "status": "DEMO"
+  }
+]
