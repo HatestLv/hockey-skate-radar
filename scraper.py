@@ -82,8 +82,9 @@ TARGET_SKATES = [
     {
         "model": "bauer-supreme-m40",
         "retailer": "sp",
-        "url": "https://www.sportega.lv/hladat?q=Supreme+M40",
-        "default_sizes": ["8"],
+        # Atjauninātā tiešā saite uz Bauer Supreme M40 Sportega lapā:
+        "url": "https://www.sportega.lv/hokeja-slidas-bauer-supreme-m40-senior/d1438036",
+        "default_sizes": ["7", "7.5", "8"],
         "default_fits": ["FIT 2"],
         "shipping": 4.0
     }
@@ -96,7 +97,6 @@ def parse_hokejapasaule(url):
             return None, None, False
         soup = BeautifulSoup(resp.text, 'html.parser')
 
-        # 1. Cenas meklēšana Schema.org datos
         for s in soup.find_all('script', type='application/ld+json'):
             try:
                 data = json.loads(s.string or '')
@@ -114,7 +114,6 @@ def parse_hokejapasaule(url):
             except Exception:
                 continue
 
-        # 2. Rezerves meklēšana HTML celtnē
         price_el = soup.select_one('[data-price-type="finalPrice"] .price, .special-price .price, .price-final_price .price')
         price = None
         if price_el:
@@ -187,6 +186,12 @@ def parse_sportega(url):
                         return float(p), None, in_stock
             except Exception:
                 continue
+
+        price_el = soup.select_one('.c-price__current, .price-main, .price')
+        if price_el:
+            digits = re.findall(r'\d+(?:[.,]\d+)?', price_el.text)
+            if digits:
+                return float(digits[0].replace(',', '.')), None, True
 
         p_match = re.search(r'(\d+[\d\s]*(?:[.,]\d{2})?)\s*€', soup.text)
         if p_match:
